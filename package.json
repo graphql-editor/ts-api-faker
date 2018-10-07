@@ -1,0 +1,37 @@
+{
+  "name": "fake-api-server",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "dependencies": {
+    "faker": "^4.1.0",
+    "graphql": "^14.0.0",
+    "micro": "^9.3.1",
+    "mongoose": "^5.1.7",
+    "node-fetch": "^2.1.2",
+    "query-string": "^6.1.0",
+    "reflect-metadata": "^0.1.12",
+    "typegoose": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/faker": "^4.1.4",
+    "@types/graphql": "^14.0.0",
+    "@types/micro": "^7.3.1",
+    "@types/mongoose": "^5.0.18",
+    "@types/node": "^10.1.2",
+    "@types/query-string": "^6.1.0",
+    "grunt": "^1.0.2",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-ts": "^6.0.0-beta.19",
+    "micro-dev": "^3.0.0",
+    "typescript": "^3.0.3"
+  },
+  "scripts": {
+    "build": "grunt",
+    "start": "micro",
+    "dev": "grunt watch | micro-dev"
+  },
+  "author": "Aexol <aexol@aexol.com> (http://aexol.com)",
+  "license": "MIT"
+}
