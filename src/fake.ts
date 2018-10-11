@@ -1,6 +1,7 @@
 import * as faker from "faker";
 import { json } from "micro";
 import { ServerResponse, IncomingMessage } from "http";
+import getRandomShape from './getRandomShape';
 
 type DictOrString = {
   [x: string]: string | DictOrString | DictOrString[];
@@ -34,6 +35,10 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
     const value = dict[key];
     if (typeof value === "string") {
       const [k, f] = value.split(".");
+      if (k === "shape") {
+        newDict[key] = getRandomShape(f);
+        continue;
+      }
       if (k === "image") {
         newDict[key] = resolveImages(f as keyof typeof faker["image"]);
         continue;
