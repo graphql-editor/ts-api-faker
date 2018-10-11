@@ -25,8 +25,8 @@ function randomGender(){
   return genders[Math.floor(Math.random()*genders.length)];
 }
 
-function randomDate(): date {
-  const now = new Data();
+function randomDate(): Date {
+  const now = new Date();
   const helper = new Date(2012, 0, 1);
   
   return new Date(helper.getTime() + Math.random() * (now.getTime() - helper.getTime()));
