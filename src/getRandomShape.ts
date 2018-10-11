@@ -2,9 +2,8 @@ const getRandom = (min: number, max: number) =>
   Math.floor(Math.random()*(max-min+1)+min);
 
 const colors = ['red', '#00ff00', 'rgb(0, 0, 255)', 'rgba(0, 255, 200, 0.5)'];
-const getRandomColor = () => {
-  return colors[getRandom(0, colors.length - 1)];
-}
+const getRandomColor = () =>
+  colors[getRandom(0, colors.length - 1)];
 
 const createCircle = () => {
   const radius = getRandom(5, 100);
