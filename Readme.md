@@ -77,6 +77,12 @@ npm run dev
 npm run start
 ```
 
+or using docker image
+
+```
+docker run -d -p 3000:3000 slothking-online/ts-api-faker
+```
+
 ## Build
 
 ```
