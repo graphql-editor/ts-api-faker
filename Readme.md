@@ -6,7 +6,11 @@ Minimal fake API server based on faker.js and unsplash.com
 
 To fake backend before its made and start frontend development just after project planning.
 
-## How it use it?
+## How it works?
+
+![](fakerserver.gif)
+
+## How to use it?
 
 After making post request with json argument
 
