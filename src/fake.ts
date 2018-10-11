@@ -23,6 +23,17 @@ const resolveImages = (name: keyof typeof faker["image"], width: string, height:
 function randomGender() {
   var genders = ["male", "female", "unset"];
   return genders[Math.floor(Math.random() * genders.length)];
+<<<<<<< HEAD
+=======
+}
+
+function randomDate(): string {
+  const now = new Date();
+  const helper = new Date(2012, 0, 1);
+  return new Date(
+    helper.getTime() + Math.random() * (now.getTime() - helper.getTime())
+  ).toISOString();
+>>>>>>> master
 }
 
 function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
@@ -40,6 +51,10 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
       }
       if (k === "gender") {
         newDict[key] = randomGender();
+        continue;
+      }
+      if (k === "date") {
+        newDict[key] = randomDate();
         continue;
       }
       if (!faker[k][f]) {
