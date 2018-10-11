@@ -8,21 +8,21 @@ type DictOrString = {
 
 type DictOrArray = DictOrString | DictOrString[];
 
-const resolveImages = (name: keyof typeof faker["image"]) => {
+const resolveImages = (name: keyof typeof faker["image"], width: string, height: string) => {
   switch (name) {
     case "dataUri":
-      return faker.image.dataUri(200, 200);
+      return faker.image.dataUri(+height, +width);
       break;
     default:
-      return `https://source.unsplash.com/200x200/?${name}`;
+      return `https://source.unsplash.com/${height}x${width}/?${name}`;
       break;
   }
 };
 // type ImageLib = Partial<{ [x in keyof typeof faker["image"]]: any }>;
 
-function randomGender(){
-  var genders = ["male","female","unset"];
-  return genders[Math.floor(Math.random()*genders.length)];
+function randomGender() {
+  var genders = ["male", "female", "unset"];
+  return genders[Math.floor(Math.random() * genders.length)];
 }
 
 function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
@@ -33,12 +33,12 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   for (var key of Object.keys(dict)) {
     const value = dict[key];
     if (typeof value === "string") {
-      const [k, f] = value.split(".");
+      const [k, f, x, y] = value.split(".");
       if (k === "image") {
-        newDict[key] = resolveImages(f as keyof typeof faker["image"]);
+        newDict[key] = resolveImages(f as keyof typeof faker["image"], x || '200', y || '200');
         continue;
       }
-      if (k === "gender"){
+      if (k === "gender") {
         newDict[key] = randomGender();
         continue;
       }
