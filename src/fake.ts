@@ -20,6 +20,11 @@ const resolveImages = (name: keyof typeof faker["image"]) => {
 };
 // type ImageLib = Partial<{ [x in keyof typeof faker["image"]]: any }>;
 
+function randomGender(){
+  var genders = ["male","female","unset"];
+  return genders[Math.floor(Math.random()*genders.length)];
+}
+
 function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   const newDict: DictOrString = {};
   if (Array.isArray(dict)) {
@@ -31,6 +36,10 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
       const [k, f] = value.split(".");
       if (k === "image") {
         newDict[key] = resolveImages(f as keyof typeof faker["image"]);
+        continue;
+      }
+      if (k === "gender"){
+        newDict[key] = randomGender();
         continue;
       }
       if (!faker[k][f]) {
