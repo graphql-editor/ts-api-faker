@@ -8,13 +8,17 @@ type DictOrString = {
 
 type DictOrArray = DictOrString | DictOrString[];
 
-const resolveImages = (name: keyof typeof faker["image"]) => {
+const resolveImages = (
+  name: keyof typeof faker["image"],
+  width: keyof typeof faker["image"],
+  height: keyof typeof faker["image"]
+  ) => {
   switch (name) {
     case "dataUri":
-      return faker.image.dataUri(200, 200);
+      return faker.image.dataUri(width, height);
       break;
     default:
-      return `https://source.unsplash.com/200x200/?${name}`;
+      return `https://source.unsplash.com/${width}x${height}/?${name}`;
       break;
   }
 };
@@ -41,9 +45,13 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   for (var key of Object.keys(dict)) {
     const value = dict[key];
     if (typeof value === "string") {
-      const [k, f] = value.split(".");
+      const [k, f, w = 200, h = 200] = value.split(".");
       if (k === "image") {
-        newDict[key] = resolveImages(f as keyof typeof faker["image"]);
+        newDict[key] = resolveImages(
+          f as keyof typeof faker["image"],
+          w as keyof typeof faker["image"],
+          h as keyof typeof faker["image"]
+        );
         continue;
       }
       if (k === "gender") {
