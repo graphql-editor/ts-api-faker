@@ -62,6 +62,19 @@ Ant these 2 photos looks like
 
 ![](https://source.unsplash.com/200x200/?dog)
 
+### Some examples of arguments to JSON
+
+| Key                 |            Result           |
+| ---                 |             :---:           |
+| address.zipCode     | 73318                       |
+| commerce.department | Toys                        |
+| company.companyName | Grant Group                 |
+| database.type       | text                        |
+| date.future         | 2016-12-12T14:50:49.361Z    |
+| lorem.words         | itaque nostrum molestiae    |
+
+Learn more about arguments that can be passed in JSON in [Faker.js Repo](https://github.com/marak/Faker.js/).
+
 ## Installation
 
 Clone this repo and run
