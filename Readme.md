@@ -1,3 +1,5 @@
+![](logo.jpg)
+
 ## What is it?
 
 Minimal fake API server based on faker.js and unsplash.com
