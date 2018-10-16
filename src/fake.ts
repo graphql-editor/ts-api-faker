@@ -47,6 +47,9 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   if (Array.isArray(dict)) {
     return dict.map(d => iterateAllValuesFaker(d)) as DictOrArray;
   }
+  if (dict === null) {
+    return null
+  }
   for (var key of Object.keys(dict)) {
     const value = dict[key];
     if (typeof value === "string") {
