@@ -1,7 +1,7 @@
 import * as faker from "faker";
-import { json } from "micro";
+import { json, createError } from "micro";
 import { ServerResponse, IncomingMessage } from "http";
-import getRandomShape from './getRandomShape';
+import getRandomShape from "./getRandomShape";
 
 type DictOrString = {
   [x: string]: string | DictOrString | DictOrString[];
@@ -29,6 +29,8 @@ const resolveImages = ({
 };
 // type ImageLib = Partial<{ [x in keyof typeof faker["image"]]: any }>;
 
+faker.random.boolean();
+
 function randomGender() {
   var genders = ["male", "female", "unset"];
   return genders[Math.floor(Math.random() * genders.length)];
@@ -44,46 +46,44 @@ function randomDate(): string {
 
 function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   const newDict: DictOrString = {};
-  if (Array.isArray(dict)) {
-    return dict.map(d => iterateAllValuesFaker(d)) as DictOrArray;
-  }
-  if (dict === null) {
-    return null
-  }
-  for (var key of Object.keys(dict)) {
-    const value = dict[key];
+  const handleValue = (value: any) => {
+    if (value === null) {
+      return value;
+    }
     if (typeof value === "string") {
       const [k, f, x, y] = value.split(".");
       if (k === "shape") {
-        newDict[key] = getRandomShape(f);
-        continue;
+        return getRandomShape(f);
       }
       if (k === "image") {
         let imageWidth = x || "200";
         let imageHeight = y || x || "200";
-        newDict[key] = resolveImages({
+        return resolveImages({
           name: f as keyof typeof faker["image"],
           width: parseInt(imageWidth),
           height: parseInt(imageHeight)
         });
-        continue;
       }
       if (k === "gender") {
-        newDict[key] = randomGender();
-        continue;
+        return randomGender();
       }
       if (k === "date") {
-        newDict[key] = randomDate();
-        continue;
+        return randomDate();
       }
       if (!faker[k][f]) {
-        newDict[key] = value;
-        continue;
+        return value;
       }
-      newDict[key] = `{{${value}}}`;
+      return faker[k][f]();
     } else {
-      newDict[key] = iterateAllValuesFaker(value);
+      return iterateAllValuesFaker(value);
     }
+  };
+  if (Array.isArray(dict)) {
+    return dict.map(d => handleValue(d)) as DictOrArray;
+  }
+  for (var key of Object.keys(dict)) {
+    const value = dict[key];
+    newDict[key] = handleValue(value);
   }
   return newDict;
 }
@@ -113,8 +113,9 @@ export const serveFakeData = async (
   if (req.method.toUpperCase() === "OPTIONS") {
     return {};
   }
-  const mySchema = (await json(req)) as DictOrString;
-  return JSON.parse(
-    faker.fake(JSON.stringify(iterateAllValuesFaker(mySchema)))
-  );
+  try {
+    return iterateAllValuesFaker((await json(req)) as DictOrString);
+  } catch (error) {
+    throw createError(500, error);
+  }
 };
