@@ -6,6 +6,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "faker": "^4.1.0",
+    "fast-levenshtein": "^2.0.6",
     "graphql": "^14.0.0",
     "micro": "^9.3.1",
     "mongoose": "^5.1.7",

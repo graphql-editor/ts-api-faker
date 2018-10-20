@@ -2,6 +2,7 @@ import * as faker from "faker";
 import { json, createError } from "micro";
 import { ServerResponse, IncomingMessage } from "http";
 import getRandomShape from "./getRandomShape";
+import { compare, keyMapObject } from "./levenshtein";
 
 type DictOrString = {
   [x: string]: string | DictOrString | DictOrString[];
@@ -14,7 +15,7 @@ const resolveImages = ({
   width,
   height
 }: {
-  name: keyof typeof faker["image"];
+  name: string;
   width: number;
   height: number;
 }) => {
@@ -43,10 +44,60 @@ function randomDate(): string {
     helper.getTime() + Math.random() * (now.getTime() - helper.getTime())
   ).toISOString();
 }
-
+const imageTypes = ["image", "picture", "photo"];
+const allKeys: keyMapObject[] = [
+  "address",
+  "commerce",
+  "company",
+  "database",
+  "finance",
+  "hacker",
+  "helpers",
+  "internet",
+  "lorem",
+  "name",
+  "phone",
+  "system"
+]
+  .map(k =>
+    Object.keys(faker[k]).map(fk => ({ name: `${k}.${fk}`, key: k, value: fk }))
+  )
+  .reduce((a, b) => [...a, ...b])
+  .concat([
+    {
+      name: "image",
+      value: "image",
+      key: "image"
+    },
+    {
+      name: "gender",
+      value: "gender",
+      key: "gender"
+    },
+    {
+      name: "shape.circle",
+      key: "shape",
+      value: "circle"
+    },
+    {
+      name: "shape.square",
+      key: "shape",
+      value: "square"
+    },
+    {
+      name: "shape.triangle",
+      key: "shape",
+      value: "triangle"
+    },
+    {
+      name: "shape.rectangle",
+      key: "shape",
+      value: "rectangle"
+    }
+  ]);
 function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   const newDict: DictOrString = {};
-  const handleValue = (value: any) => {
+  const handleValue = (value: any, key?: string) => {
     if (value === null) {
       return value;
     }
@@ -58,8 +109,9 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
       if (k === "image") {
         let imageWidth = x || "200";
         let imageHeight = y || x || "200";
+        let imageName = f || key || "image";
         return resolveImages({
-          name: f as keyof typeof faker["image"],
+          name: imageName,
           width: parseInt(imageWidth),
           height: parseInt(imageHeight)
         });
@@ -69,6 +121,18 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
       }
       if (k === "date") {
         return randomDate();
+      }
+      const [isImageType] = imageTypes.filter(i =>
+        key.toLowerCase().match(i.toLowerCase())
+      );
+      if (isImageType) {
+        return handleValue("image", key.toLowerCase().replace(isImageType, ""));
+      }
+      if (!faker[k]) {
+        if (value === "String" || value === "string") {
+          return handleValue(compare(key, allKeys), key);
+        }
+        return value;
       }
       if (!faker[k][f]) {
         return value;
@@ -83,7 +147,7 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
   }
   for (var key of Object.keys(dict)) {
     const value = dict[key];
-    newDict[key] = handleValue(value);
+    newDict[key] = handleValue(value, key);
   }
   return newDict;
 }
