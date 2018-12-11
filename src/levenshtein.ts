@@ -1,4 +1,5 @@
 import * as levenshtein from "fast-levenshtein";
+import * as LRU from "lru-cache"
 
 export type keyMapObject = {
   name: string;
@@ -6,7 +7,17 @@ export type keyMapObject = {
   value: string;
 };
 
+// 5MB Cache 
+var lru = new LRU({
+  max: 5 * 1024 * 1024,
+  maxAge: 1000 * 60 * 60,
+  length: (n: string, key: string) => { return n.length + key.length }
+})
+
 export const compare = (s: string, all: keyMapObject[]) => {
+  if (lru.has(s)) {
+    return lru.get(s)
+  }
   let minDistance = Infinity;
   let bestMatch = s;
   for (var st of all) {
@@ -26,6 +37,6 @@ export const compare = (s: string, all: keyMapObject[]) => {
       minDistance = distance2;
     }
   }
-  console.log(s, bestMatch);
+  lru.set(s, bestMatch)
   return bestMatch;
 };

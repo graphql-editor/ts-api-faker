@@ -5,9 +5,11 @@
   "description": "",
   "main": "lib/index.js",
   "dependencies": {
+    "@types/lru-cache": "^4.1.1",
     "faker": "^4.1.0",
     "fast-levenshtein": "^2.0.6",
     "graphql": "^14.0.0",
+    "lru-cache": "^5.1.1",
     "micro": "^9.3.1",
     "mongoose": "^5.1.7",
     "node-fetch": "^2.1.2",
