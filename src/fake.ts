@@ -15,10 +15,10 @@ const resolveImages = ({
   width,
   height
 }: {
-  name: string;
-  width: number;
-  height: number;
-}) => {
+    name: string;
+    width: number;
+    height: number;
+  }) => {
   switch (name) {
     case "dataUri":
       return faker.image.dataUri(width, height);
@@ -95,7 +95,7 @@ const allKeys: keyMapObject[] = [
       value: "rectangle"
     }
   ]);
-function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
+function iterateAllValuesFaker(dict: DictOrArray, key?: string): DictOrArray {
   const newDict: DictOrString = {};
   const handleValue = (value: any, key?: string) => {
     if (value === null) {
@@ -103,6 +103,12 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
     }
     if (typeof value === "string") {
       const [k, f, x, y] = value.split(".");
+      // short path, if we have an exact
+      // match for supplied value,
+      // return it
+      if (typeof (faker[k]) != "undefined" && typeof (faker[k][f]) != "undefined") {
+        return faker[k][f]();
+      }
       if (k === "shape") {
         return getRandomShape(f);
       }
@@ -122,28 +128,27 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
       if (k === "date") {
         return randomDate();
       }
+      // Try to guess what kind of data to fake
+      // based on property name
+      if (typeof (key) === "undefined") {
+        return "<<could not fake field, missing faker data>>"
+      }
       const [isImageType] = imageTypes.filter(i =>
         key.toLowerCase().match(i.toLowerCase())
       );
       if (isImageType) {
         return handleValue("image", key.toLowerCase().replace(isImageType, ""));
       }
-      if (!faker[k]) {
-        if (value === "String" || value === "string") {
-          return handleValue(compare(key, allKeys), key);
-        }
-        return value;
+      if (value === "String" || value === "string") {
+        return handleValue(compare(key, allKeys), key);
       }
-      if (!faker[k][f]) {
-        return value;
-      }
-      return faker[k][f]();
+      return value;
     } else {
-      return iterateAllValuesFaker(value);
+      return iterateAllValuesFaker(value, key);
     }
   };
   if (Array.isArray(dict)) {
-    return dict.map(d => handleValue(d)) as DictOrArray;
+    return dict.map(d => handleValue(d, key)) as DictOrArray;
   }
   for (var key of Object.keys(dict)) {
     const value = dict[key];
