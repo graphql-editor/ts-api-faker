@@ -98,53 +98,52 @@ const allKeys: keyMapObject[] = [
 function iterateAllValuesFaker(dict: DictOrArray, key?: string): DictOrArray {
   const newDict: DictOrString = {};
   const handleValue = (value: any, key?: string) => {
-    if (value === null) {
-      return value;
-    }
-    if (typeof value === "string") {
-      const [k, f, x, y] = value.split(".");
-      // short path, if we have an exact
-      // match for supplied value,
-      // return it
-      if (typeof (faker[k]) != "undefined" && typeof (faker[k][f]) != "undefined") {
+    try {
+      if (value === null) {
+        return value;
+      }
+      if (typeof value === "string") {
+        const [k, f, x, y] = value.split(".");
+        if (k === "shape") {
+          return getRandomShape(f);
+        }
+        if (k === "image") {
+          let imageWidth = x || "200";
+          let imageHeight = y || x || "200";
+          let imageName = f || key || "image";
+          return resolveImages({
+            name: imageName,
+            width: parseInt(imageWidth),
+            height: parseInt(imageHeight)
+          });
+        }
+        if (k === "gender") {
+          return randomGender();
+        }
+        if (k === "date") {
+          return randomDate();
+        }
+        const [isImageType] = imageTypes.filter(i =>
+          key.toLowerCase().match(i.toLowerCase())
+        );
+        if (isImageType) {
+          return handleValue("image", key.toLowerCase().replace(isImageType, ""));
+        }
+        if (!faker[k]) {
+          if (value === "String" || value === "string") {
+            return handleValue(compare(key, allKeys), key);
+          }
+          return value;
+        }
+        if (!faker[k][f]) {
+          return value;
+        }
         return faker[k][f]();
+      } else {
+        return iterateAllValuesFaker(value);
       }
-      if (k === "shape") {
-        return getRandomShape(f);
-      }
-      if (k === "image") {
-        let imageWidth = x || "200";
-        let imageHeight = y || x || "200";
-        let imageName = f || key || "image";
-        return resolveImages({
-          name: imageName,
-          width: parseInt(imageWidth),
-          height: parseInt(imageHeight)
-        });
-      }
-      if (k === "gender") {
-        return randomGender();
-      }
-      if (k === "date") {
-        return randomDate();
-      }
-      // Try to guess what kind of data to fake
-      // based on property name
-      if (typeof (key) === "undefined") {
-        return "<<could not fake field, missing faker data>>"
-      }
-      const [isImageType] = imageTypes.filter(i =>
-        key.toLowerCase().match(i.toLowerCase())
-      );
-      if (isImageType) {
-        return handleValue("image", key.toLowerCase().replace(isImageType, ""));
-      }
-      if (value === "String" || value === "string") {
-        return handleValue(compare(key, allKeys), key);
-      }
-      return value;
-    } else {
-      return iterateAllValuesFaker(value, key);
+    } catch (e) {
+      return `<<field could not be faked, reason: ${e.message}>>`
     }
   };
   if (Array.isArray(dict)) {
