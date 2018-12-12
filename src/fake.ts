@@ -95,7 +95,7 @@ const allKeys: keyMapObject[] = [
       value: "rectangle"
     }
   ]);
-function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
+function iterateAllValuesFaker(dict: DictOrArray, key?: string): DictOrArray {
   const newDict: DictOrString = {};
   const handleValue = (value: any, key?: string) => {
     try {
@@ -147,7 +147,7 @@ function iterateAllValuesFaker(dict: DictOrArray): DictOrArray {
     }
   };
   if (Array.isArray(dict)) {
-    return dict.map(d => handleValue(d)) as DictOrArray;
+    return dict.map(d => handleValue(d, key)) as DictOrArray;
   }
   for (var key of Object.keys(dict)) {
     const value = dict[key];
