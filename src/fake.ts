@@ -57,6 +57,7 @@ const allKeys: keyMapObject[] = [
   "lorem",
   "name",
   "phone",
+  "random",
   "system"
 ]
   .map(k =>
@@ -101,6 +102,9 @@ function iterateAllValuesFaker(dict: DictOrArray, key?: string): DictOrArray {
     try {
       if (value === null) {
         return value;
+      }
+      if (typeof value === "number") {
+        return value
       }
       if (typeof value === "string") {
         const [k, f, x, y] = value.split(".");
