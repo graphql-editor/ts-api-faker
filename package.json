@@ -10,11 +10,11 @@
     "graphql": "^14.0.0",
     "lru-cache": "^5.1.1",
     "micro": "^9.3.1",
-    "mongoose": "^5.1.7",
+    "mongoose": "^5.6.9",
     "node-fetch": "^2.1.2",
     "query-string": "^6.1.0",
     "reflect-metadata": "^0.1.12",
-    "typegoose": "^5.2.1"
+    "typegoose": "^5.9.0"
   },
   "devDependencies": {
     "@types/faker": "^4.1.4",
@@ -24,9 +24,9 @@
     "@types/mongoose": "^5.0.18",
     "@types/node": "^10.1.2",
     "@types/query-string": "^6.1.0",
-    "grunt": "^1.0.2",
+    "grunt": "^1.0.4",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-ts": "^6.0.0-beta.19",
+    "grunt-ts": "^6.0.0-beta.22",
     "micro-dev": "^3.0.0",
     "typescript": "^3.0.3"
   },

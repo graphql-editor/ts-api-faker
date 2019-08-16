@@ -1,8 +1,9 @@
 import * as faker from "faker";
-import { json, createError } from "micro";
+import { buffer, createError } from "micro";
 import { ServerResponse, IncomingMessage } from "http";
 import getRandomShape from "./getRandomShape";
 import { compare, keyMapObject } from "./levenshtein";
+import { gunzip } from "zlib"
 
 type DictOrString = {
   [x: string]: string | DictOrString | DictOrString[];
@@ -103,51 +104,50 @@ function iterateAllValuesFaker(dict: DictOrArray, key?: string): DictOrArray {
       if (value === null) {
         return value;
       }
-      if (typeof value === "number") {
-        return value
-      }
-      if (typeof value === "string") {
-        const [k, f, x, y] = value.split(".");
-        // short path, if we have an exact
-        // match for supplied value,
-        // return it
-        if (typeof (faker[k]) !== "undefined" && typeof (faker[k][f]) !== "undefined") {
-          return faker[k][f]();
-        }
-        if (k === "shape") {
-          return getRandomShape(f);
-        }
-        if (k === "image") {
-          let imageWidth = x || "200";
-          let imageHeight = y || x || "200";
-          let imageName = f || key || "image";
-          return resolveImages({
-            name: imageName,
-            width: parseInt(imageWidth),
-            height: parseInt(imageHeight)
-          });
-        }
-        if (k === "gender") {
-          return randomGender();
-        }
-        if (k === "date") {
-          return randomDate();
-        }
-        const [isImageType] = imageTypes.filter(i =>
-          typeof key === "undefined" ? undefined : key.toLowerCase().match(i.toLowerCase())
-        );
-        if (isImageType) {
-          return handleValue("image", key.toLowerCase().replace(isImageType, ""));
-        }
-        if (value === "String" || value === "string") {
-          if (typeof key === "undefined") {
-            return faker.lorem.word()
+      switch (typeof value) {
+        case "number":
+          return value
+        case "string":
+          const [k, f, x, y] = value.split(".");
+          // short path, if we have an exact
+          // match for supplied value,
+          // return it
+          if (typeof (faker[k]) !== "undefined" && typeof (faker[k][f]) !== "undefined") {
+            return faker[k][f]();
           }
-          return handleValue(compare(key, allKeys), key);
-        }
-        return value
-      } else {
-        return iterateAllValuesFaker(value);
+          switch (k) {
+            case "shape":
+              return getRandomShape(f);
+            case "image":
+              let imageWidth = x || "200";
+              let imageHeight = y || x || "200";
+              let imageName = f || key || "image";
+              return resolveImages({
+                name: imageName,
+                width: parseInt(imageWidth),
+                height: parseInt(imageHeight)
+              });
+            case "gender":
+              return randomGender();
+            case "date":
+              return randomDate();
+            default:
+              const [isImageType] = imageTypes.filter(i =>
+                typeof key === "undefined" ? undefined : key.toLowerCase().match(i.toLowerCase())
+              );
+              if (isImageType) {
+                return handleValue("image", key.toLowerCase().replace(isImageType, ""));
+              }
+              if (value === "String" || value === "string") {
+                if (typeof key === "undefined") {
+                  return faker.lorem.word()
+                }
+                return handleValue(compare(key, allKeys), key);
+              }
+              return value
+          }
+        default:
+          return iterateAllValuesFaker(value);
       }
     } catch (e) {
       return `<<field could not be faked, reason: ${e.message}>>`
@@ -183,6 +183,7 @@ export const serveFakeData = async (
       "Access-Control-Allow-Origin",
       "X-HTTP-Method-Override",
       "Content-Type",
+      "Content-Encoding",
       "Authorization",
       "Accept"
     ].join(",")
@@ -192,7 +193,31 @@ export const serveFakeData = async (
     return {};
   }
   try {
-    return iterateAllValuesFaker((await json(req)) as DictOrString);
+    return iterateAllValuesFaker(await buffer(req, { limit: "10mb" })
+      .then(body => {
+        switch (req.headers["content-encoding"]) {
+          case "gzip":
+            return new Promise<string>((resolve, reject) => {
+              gunzip(body, (err, buf) => {
+                if (err) {
+                  reject(createError(400, "Invalid gzip", err))
+                  return
+                }
+                resolve(buf.toString())
+              })
+            })
+          default:
+            return body.toString()
+        }
+      })
+      .then(body => {
+        try {
+          return JSON.parse(body)
+        } catch (err) {
+          createError(400, "Invalid JSON", err)
+        }
+      })
+    )
   } catch (error) {
     throw createError(500, error);
   }
