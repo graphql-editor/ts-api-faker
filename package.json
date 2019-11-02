@@ -10,7 +10,7 @@
     "graphql": "^14.0.0",
     "lru-cache": "^5.1.1",
     "micro": "^9.3.1",
-    "mongoose": "^5.6.9",
+    "mongoose": "^5.7.5",
     "node-fetch": "^2.1.2",
     "query-string": "^6.1.0",
     "reflect-metadata": "^0.1.12",
