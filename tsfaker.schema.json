@@ -1,0 +1,69 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$id": "http://tsfaker.graphqleditor.com",
+	"description": "describes accepted input values by ts faker service",
+	"allOf": [
+		{"$ref":"#/definitions/valueOrArrayValue"}
+	],
+	"definitions": {
+		"rawValue": {
+			"type": "object",
+			"description": "value is to be left as is without faking",
+			"additionalProperties": false,
+			"properties": {
+				"raw": {
+					"anyOf": [
+						{"type":"null"},
+						{"type":"object"},
+						{"type":"array"},
+						{"type":"number"},
+						{"type":"boolean"},
+						{"type":"string"},
+						{"type":"integer"}
+					]
+				}
+			},
+			"required": ["raw"]
+		},
+		"fakeValue": {
+			"type": "object",
+			"description": "value is to be faked",
+			"additionalProperties": false,
+			"properties": {
+				"fake": {"type":"string"}
+			},
+			"required": ["fake"]
+		},
+		"objectValue": {
+			"type": "object",
+			"description": "value is to be faked",
+			"additionalProperties": false,
+			"properties": {
+				"fields": {
+					"type":"object",
+					"additionalProperties": false,
+					"patternProperties": {
+						".*": {"$ref":"#/definitions/valueOrArrayValue"}
+					}
+				}
+			},
+			"required": ["fields"]
+		},
+		"value": {
+			"oneOf": [
+				{"$ref":"#/definitions/rawValue"},
+				{"$ref":"#/definitions/fakeValue"},
+				{"$ref":"#/definitions/objectValue"}
+			]
+		},
+		"valueOrArrayValue": {
+			"oneOf": [
+				{"$ref":"#/definitions/value"},
+				{
+					"type": "array",
+					"items": {"$ref":"#/definitions/valueOrArrayValue"}
+				}
+			]
+		}
+	}
+}

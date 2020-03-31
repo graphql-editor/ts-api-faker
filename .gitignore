@@ -4,3 +4,4 @@ lib
 .tscache
 *.tmp.txt
 *.map
+coverage

@@ -1,5 +1,5 @@
-import * as levenshtein from "fast-levenshtein";
-import * as LRU from "lru-cache"
+import * as levenshtein from 'fast-levenshtein';
+import LRU from 'lru-cache';
 
 export type keyMapObject = {
   name: string;
@@ -7,36 +7,38 @@ export type keyMapObject = {
   value: string;
 };
 
-// 5MB Cache 
-var lru = new LRU({
+// 5MB Cache
+const lru = new LRU({
   max: 5 * 1024 * 1024,
   maxAge: 1000 * 60 * 60,
-  length: (n: string, key: string) => { return n.length + key.length }
-})
+  length: (n: string, key: string): number => {
+    return n.length + key.length;
+  },
+});
 
-export const compare = (s: string, all: keyMapObject[]) => {
+export const compare = (s: string, all: keyMapObject[]): string => {
   if (lru.has(s)) {
-    return lru.get(s)
+    return lru.get(s);
   }
   let minDistance = Infinity;
   let bestMatch = s;
-  for (var st of all) {
-    const distance = levenshtein.get(s, st.name);
-    if (distance < minDistance) {
-      bestMatch = st.name;
-      minDistance = distance;
-    }
-    const distance1 = levenshtein.get(s, st.value);
-    if (distance1 < minDistance) {
-      bestMatch = st.name;
-      minDistance = distance1;
-    }
-    const distance2 = levenshtein.get(s, st.key);
-    if (distance2 < minDistance) {
-      bestMatch = st.name;
-      minDistance = distance2;
+  for (const st of all) {
+    [st.name, st.value, st.key].forEach((v) => {
+      // short path, minDistance is alread at zero
+      // no need for further checks
+      if (!minDistance) {
+        return;
+      }
+      const distance = levenshtein.get(s, v);
+      if (distance < minDistance) {
+        bestMatch = st.name;
+        minDistance = distance;
+      }
+    });
+    if (!minDistance) {
+      break;
     }
   }
-  lru.set(s, bestMatch)
+  lru.set(s, bestMatch);
   return bestMatch;
 };
