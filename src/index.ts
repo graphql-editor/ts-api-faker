@@ -2,6 +2,7 @@ import { buffer, createError } from 'micro';
 import { ServerResponse, IncomingMessage } from 'http';
 import { gunzip } from 'zlib';
 import { RValueOrArrayValue, iterateAllValuesFaker } from './fake';
+import { gzip, header } from './util';
 
 async function getBody(req: IncomingMessage): Promise<RValueOrArrayValue> {
   const body = await buffer(req, { limit: '10mb' });
@@ -48,7 +49,13 @@ const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     return '';
   }
-  return iterateAllValuesFaker(await getBody(req));
+  const gzipResponse = header(req.headers, 'accept-encoding').find((v) => v === 'gzip');
+  const body = JSON.stringify(iterateAllValuesFaker(await getBody(req)));
+  res.setHeader('content-type', 'application/json');
+  if (gzipResponse) {
+    res.setHeader('content-encoding', 'gzip');
+  }
+  return gzipResponse ? gzip(body) : body;
 };
 
 export default serveFakeData;

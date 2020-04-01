@@ -1,7 +1,7 @@
 import micro from 'micro';
 import handler from '../src';
 import { request, IncomingHttpHeaders } from 'http';
-import { gzip } from 'zlib';
+import { gzip, gunzip } from 'zlib';
 
 describe('test micro integration', () => {
   const server = micro(handler);
@@ -23,11 +23,13 @@ describe('test micro integration', () => {
     body,
     encoding,
     method,
+    acceptEncoding,
   }: {
     body?: string | Buffer;
     encoding?: string;
     method?: string;
-  }): Promise<{ data: unknown; headers: IncomingHttpHeaders; statusCode: number }> =>
+    acceptEncoding?: string | string[];
+  }): Promise<{ data: Buffer; headers: IncomingHttpHeaders; statusCode: number }> =>
     new Promise((resolve, reject) => {
       const req = request(
         {
@@ -37,12 +39,13 @@ describe('test micro integration', () => {
           headers: {
             'Content-Type': 'application/json',
             ...(encoding && { 'Content-Encoding': encoding }),
+            ...(acceptEncoding && { 'accept-encoding': acceptEncoding }),
           },
         },
         (resp) => {
-          let data = '';
+          let data = Buffer.from('');
           resp.on('data', (chunk) => {
-            data += chunk.toString();
+            data = Buffer.concat([data, Buffer.from(chunk)]);
           });
           resp.on('error', (e) => reject(e));
           resp.on('end', () =>
@@ -64,14 +67,15 @@ describe('test micro integration', () => {
     const resp = await makeRequest({
       body: JSON.stringify({ raw: 'mockdata' }),
     });
-    expect(resp.data).toEqual('mockdata');
+    expect(resp.data.toString()).toEqual('"mockdata"');
+    expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.statusCode).toEqual(200);
   });
   it('bad request on malformed json', async () => {
     const resp = await makeRequest({
       body: 'notreallyajson',
     });
-    expect(resp.data).toEqual('Invalid JSON');
+    expect(resp.data.toString()).toEqual('Invalid JSON');
     expect(resp.statusCode).toEqual(400);
   });
   it('handles gzipped json', async () => {
@@ -85,13 +89,24 @@ describe('test micro integration', () => {
       }),
     );
     const resp = await makeRequest({ body, encoding: 'gzip' });
-    expect(resp.data).toEqual('mockdata');
+    expect(resp.data.toString()).toEqual('"mockdata"');
+    expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.statusCode).toEqual(200);
   });
   it('bad request on invalid gzip', async () => {
     const resp = await makeRequest({ body: 'notreallyagzip', encoding: 'gzip' });
-    expect(resp.data).toEqual('Invalid gzip');
+    expect(resp.data.toString()).toEqual('Invalid gzip');
     expect(resp.statusCode).toEqual(400);
+  });
+  it('responds with gzip', async () => {
+    const resp = await makeRequest({ body: JSON.stringify({ raw: 'mockdata' }), acceptEncoding: 'gzip,deflate' });
+    expect(resp.headers['content-type']).toEqual('application/json');
+    expect(resp.headers['content-encoding']).toEqual('gzip');
+    const data = await new Promise((resolve, reject) =>
+      gunzip(resp.data, (err, body) => (err ? reject(err) : resolve(body))),
+    );
+    expect(data.toString()).toEqual('"mockdata"');
+    expect(resp.statusCode).toEqual(200);
   });
   it('accepts preflight', async () => {
     const resp = await makeRequest({ method: 'OPTIONS' });
