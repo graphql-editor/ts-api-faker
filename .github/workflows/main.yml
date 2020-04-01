@@ -1,0 +1,43 @@
+on:
+  push:
+    branches:
+    - '**'
+    tags-ignore:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    branches:
+      - master
+name: test
+jobs:
+  test:
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    strategy:
+      matrix:
+        node: [10, 12]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+    - name: checkout
+      uses: actions/checkout@v1
+    - name: Get npm cache directory
+      id: npm-cache
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ steps.npm-cache.outputs.dir }}
+        key: ${{ matrix.platform }}-node-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ matrix.platform }}-node-${{ matrix.node }}
+    - name: install deps
+      run: npm ci
+    - name: run lint
+      run: npm run lint
+    - name: run tests
+      run: npm run test
+    - name: build
+      run: npm run build
