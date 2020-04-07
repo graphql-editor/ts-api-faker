@@ -83,7 +83,7 @@ function isObjectValue(v: RValueOrArrayValue): v is ObjectValue {
 }
 type Value = RawValue | FakeValue | ObjectValue;
 type ValueOrArrayValue = Value | Array<RValueOrArrayValue>;
-export type RValueOrArrayValue = Value | Array<ValueOrArrayValue>;
+export type RValueOrArrayValue = Value | Array<ValueOrArrayValue> | null;
 function isArrayValue(v: RValueOrArrayValue): v is Array<ValueOrArrayValue> {
   return Array.isArray(v);
 }

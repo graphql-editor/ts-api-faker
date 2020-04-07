@@ -19,18 +19,42 @@ After making post request with json argument
 ```json
 [
   {
-    "name": "name.firstName",
-    "surname": "name.lastName",
-    "mail": "internet.email",
-    "profilePhoto": "internet.avatar",
-    "animalPhoto": "image.cat"
+    "fields": {
+      "name": {
+        "fake": "name.firstName"
+      },
+      "surname": {
+        "fake": "name.lastName"
+      },
+      "mail": {
+        "fake": "internet.email"
+      },
+      "profilePhoto": {
+        "fake": "internet.avatar"
+      },
+      "animalPhoto": {
+        "fake": "image.cat"
+      }
+    }
   },
   {
-    "name": "name.firstName",
-    "surname": "name.lastName",
-    "mail": "internet.email",
-    "profilePhoto": "internet.avatar",
-    "animalPhoto": "image.dog"
+    "fields": {
+      "name": {
+        "fake": "name.firstName"
+      },
+      "surname": {
+        "fake": "name.lastName"
+      },
+      "mail": {
+        "fake": "internet.email"
+      },
+      "profilePhoto": {
+        "fake": "internet.avatar"
+      },
+      "animalPhoto": {
+        "fake": "image.dog"
+      }
+    }
   }
 ]
 ```
@@ -40,18 +64,18 @@ it returns
 ```json
 [
   {
-    "name": "Van",
-    "surname": "Veum",
-    "mail": "Corbin.Fritsch49@gmail.com",
-    "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/pixage/128.jpg",
-    "animalPhoto": "https://source.unsplash.com/200x200/?cat"
+    "animalPhoto": "https://source.unsplash.com/200x200/?cat",
+    "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/gu5taf/128.jpg",
+    "mail": "Bernhard_Bradtke@hotmail.com",
+    "surname": "Schaefer",
+    "name": "Madelynn"
   },
   {
-    "name": "Serena",
-    "surname": "Wilderman",
-    "mail": "Mariam_Thiel@hotmail.com",
-    "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/imcoding/128.jpg",
-    "animalPhoto": "https://source.unsplash.com/200x200/?dog"
+    "animalPhoto": "https://source.unsplash.com/200x200/?dog",
+    "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/Elt_n/128.jpg",
+    "mail": "Eula_Spencer24@gmail.com",
+    "surname": "Herzog",
+    "name": "Lempi"
   }
 ]
 ```
