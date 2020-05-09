@@ -7,7 +7,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
-COPY Gruntfile.js /app/Gruntfile.js
 COPY tsconfig.json /app/tsconfig.json
 COPY ./src /app/src
 WORKDIR /app

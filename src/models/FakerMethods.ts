@@ -1,0 +1,15 @@
+export const FakerMethods = [
+    'address',
+    'commerce',
+    'company',
+    'database',
+    'finance',
+    'hacker',
+    'helpers',
+    'internet',
+    'lorem',
+    'name',
+    'phone',
+    'random',
+    'system',
+]

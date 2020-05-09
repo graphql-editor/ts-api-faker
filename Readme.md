@@ -1,4 +1,4 @@
-![](logo.jpg)
+![](img/logo.jpg)
 
 ## What is it?
 
@@ -10,7 +10,7 @@ To fake backend before its made and start frontend development just after projec
 
 ## How it works?
 
-![](fakerserver.gif)
+![](img/fakerserver.gif)
 
 ## How to use it?
 

@@ -14,7 +14,10 @@
     "baseUrl": "src",
     "rootDir": "src",
 	"types": ["node", "jest"],
-	"esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+        "@app/*": ["./*"]
+    }
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["lib", "build", "node_modules"]

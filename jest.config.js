@@ -5,7 +5,10 @@ module.exports = {
 	transform: {'^.+\\.ts?$': 'ts-jest'},
 	testEnvironment: 'node',
 	testMatch: ['**/tests/**/*.test.ts'],
-	moduleFileExtensions: ['ts', 'js'],
+    moduleFileExtensions: ['ts', 'js'],
+    moduleNameMapper: {
+        "@app(.*)$": "<rootDir>/src/$1",
+    },
 	globals: {
 		"ts-jest": {
 			tsConfig: "tsconfig.json"

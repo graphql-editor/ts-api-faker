@@ -8,10 +8,11 @@
     "faker": "^4.1.0",
     "fast-levenshtein": "^2.0.6",
     "lru-cache": "^5.1.1",
-    "micro": "^9.3.1"
+    "micro": "^9.3.1",
+    "module-alias": "^2.2.2"
   },
   "devDependencies": {
-    "@types/faker": "^4.1.4",
+    "@types/faker": "^4.1.11",
     "@types/fast-levenshtein": "0.0.1",
     "@types/jest": "^25.1.4",
     "@types/lru-cache": "^5.1.0",
@@ -22,9 +23,6 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-prefer-arrow": "^1.1.6",
     "eslint-plugin-prettier": "^3.1.1",
-    "grunt": "^1.1.0",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-ts": "^6.0.0-beta.22",
     "jest": "^25.2.1",
     "jest-circus": "^25.2.1",
     "micro-dev": "^3.0.0",
@@ -33,11 +31,14 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "build": "grunt",
+    "build": "tsc",
     "start": "micro",
-    "dev": "grunt watch | micro-dev",
+    "dev": "node --harmony | tsc -w | micro-dev",
     "test": "jest",
     "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\""
+  },
+  "_moduleAliases": {
+    "@app": "lib/"
   },
   "author": "Aexol <aexol@aexol.com> (http://aexol.com)",
   "license": "MIT"

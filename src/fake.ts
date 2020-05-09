@@ -1,4 +1,5 @@
 import * as faker from 'faker';
+
 import getRandomShape from './getRandomShape';
 import { compare, keyMapObject } from './levenshtein';
 
@@ -69,26 +70,32 @@ const allKeys: keyMapObject[] = [
 interface RawValue {
   raw: unknown;
 }
+
 function isRawValue(v: RValueOrArrayValue): v is RawValue {
   return v && typeof v === 'object' && 'raw' in v;
 }
+
 interface FakeValue {
   fake: string;
 }
 interface ObjectValue {
   fields: { [k: string]: RValueOrArrayValue };
 }
+
 function isObjectValue(v: RValueOrArrayValue): v is ObjectValue {
   return v && typeof v === 'object' && 'fields' in v;
 }
+
 type Value = RawValue | FakeValue | ObjectValue;
 type ValueOrArrayValue = Value | Array<RValueOrArrayValue>;
 export type RValueOrArrayValue = Value | Array<ValueOrArrayValue> | null;
+
 function isArrayValue(v: RValueOrArrayValue): v is Array<ValueOrArrayValue> {
   return Array.isArray(v);
 }
 
 export function iterateAllValuesFaker(data: RValueOrArrayValue, key?: string): unknown {
+
   const handleValue = (value: RValueOrArrayValue, key?: string): unknown => {
     try {
       if (value === null) {
