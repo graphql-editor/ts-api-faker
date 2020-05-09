@@ -1,27 +1,30 @@
 import * as faker from 'faker';
 
-
-import { isArray, isObject, objectFromEntries, isNumber } from '@app/helpers/helpers';
+import { isArray, isObject, objectFromEntries, isNumber, getRandomElementFromArray } from '@app/helpers/helpers';
 import RandomShapeService from '@app/services/RandomShapeService';
 
 const shape = new RandomShapeService();
 
 export function createResponse(parsedReq: string): string {
-
     const data: object = JSON.parse(parsedReq);
     let preparedData: object = {};
     preparedData = passDecode(data, fakeValue, 'static'); //? 1. PASS
     preparedData = passRepeat(preparedData);//? 2. SEC PASS
     !Array.isArray(data) ?
-    preparedData = passFillFromSettings(preparedData): null; //? 3. fill from settings
+    preparedData = passSettingsAndKeyDirective(preparedData): null; //? 3. fill from settings
+    typeof preparedData['@settings'] !== 'undefined' ?
+    delete preparedData['@settings'] : null;
     preparedData = passDecode(JSON.parse(JSON.stringify(preparedData)), fakeValue); //? 4. rest
 
+    //TODO @root directive
+
+    console.log(process.memoryUsage());
     return JSON.stringify(preparedData);
 };
 
 function passDecode(obj: object, decoder: CallableFunction, directive?: string): object {
     let data  = obj;
-    let dec = decoder;
+    let callB   = decoder;
     const dir = directive || '';
     let pattern: RegExp = /\'\'/g;
     dir !== '' ? pattern = new RegExp(`@(${dir}:?)`, 'g'): null;
@@ -29,14 +32,13 @@ function passDecode(obj: object, decoder: CallableFunction, directive?: string):
         if(typeof data[key] === 'string' && data[key].includes(dir)) {
             pattern !== /\'\'/g ?
             data[key] = data[key].replace(pattern, ''): null;
-            data[key] = dec(data[key]);
+            data[key] = callB(data[key]);
         }
-        isArray(data[key]) || isObject(data[key]) ? passDecode(data[key], dec, dir) : null;
+        isArray(data[key]) || isObject(data[key]) ? passDecode(data[key], callB, dir) : null;
     }
     return data;
 };
 
-//? REPEAT NIGDY NIE DEKODUJE!!
 function passRepeat <T> (obj: object | Array<T>): object {
     let data = obj;
     for (let key in data) {
@@ -44,8 +46,11 @@ function passRepeat <T> (obj: object | Array<T>): object {
             data[key] = data[key].replace(/@(repeat:?)/g, '');
             let rep: string = data[key];
             if (data[key].includes(',')) {
-                rep = rep.split(',').find(el => isNumber(el));
-                data[key] = data[key].replace(rep, '').replace(/\,/g, '');
+                //? 2nd
+                // rep = rep.split(',').find(el => isNumber(el));
+                // data[key] = data[key].replace(rep, '').replace(/\,/g, '');
+                rep = rep.match(/\w+/g).find(el => isNumber(el));
+                data[key] = data[key].replace(/\d,?/g, '');
                 for (let i = 0; i < parseInt(rep); i++) {
                     Array.isArray(data) ? data.push(data[key]) : null;
                 }
@@ -61,27 +66,51 @@ function passRepeat <T> (obj: object | Array<T>): object {
     return data;
 };
 
-function passFillFromSettings(obj: object, parent?: object): object {
+function passSettingsAndKeyDirective(obj: object, parent?: object): object {
     let data = obj;
     const parentData = parent || obj;
     if (typeof parentData['data'] || parentData['definitions'] !== 'undefined') {
-       // 1. trawers po zmiennych
-       // 2. podstawienie danych z klucza i malucha
        for (let key in data) {
-
+            //? @key directive
             if (isObject(data[key])) {
-                // console.log(data[key]);
+                data[key] = objectFromEntries(Object.entries<string>(data[key]).map(([keys, val]) => {
+                    typeof val === 'string' && val.trim() === '@key' ?
+                    val = faker[keys][getRandomElementFromArray(Object.keys(faker[keys]))](): null;
+                    return [keys, val];
+                }));
             }
 
-            // && data[key].includes(('@data' || '@use'))
-            if(typeof data[key] === 'string') {
-                // pattern !== /\'\'/g ?
-                // data[key] = data[key].replace(pattern, ''): null;
-                // data[key] = decoder(data[key]);
-                // console.log(data[key]);
-                // console.log(parentData);
+            if(typeof data[key] === 'string' && (/@(use|data):?/g).test(data[key])) {
+                let entries: Array<string> = data[key].match(/\w+/g);
+                let entry: string = '';
+
+                //? @data directive | future: @data:myobj:mykey = value | data[key] = value;
+                if ((/@(data):?/g).test(data[key])) {
+                    entry = entries.find(el => /^data/.test(el));
+                    entries.splice(entries.indexOf(entry), 1);
+                    let startingPoint = parentData['@settings'][entry];
+                    let result: string | object = '';
+                    entries.map(el => {
+                        if (typeof startingPoint[el] !== 'undefined') {
+                            return result = startingPoint[el];
+                        }
+
+                        if(typeof result[el] !== 'undefined') {
+                            return result = result[el];
+                        }
+                    });
+                    data[key] = result;
+                }
+
+                //? @use directive | entry = for future purposes
+                if ((/@(use):?/g).test(data[key])) {
+                    entry = entries.find(el => /^use/.test(el));
+                    entries.splice(entries.indexOf(entry), 1);
+                    data[key] = parentData['@settings']['definitions'][entries.map(el => el)];
+                }
             }
-            isArray(data[key]) || isObject(data[key]) ? passFillFromSettings(data[key], parentData) : null;
+
+            isArray(data[key]) || isObject(data[key]) ? passSettingsAndKeyDirective(data[key], parentData) : null;
         }
     }
     return data;
@@ -112,11 +141,12 @@ function fakeValue(word: string): string {
             if (typeof faker[key][value.trim()] !== 'undefined') {
                 break;
             }
-            return randomDate()
+            return randomDate();
         default:
             break;
     }
 
+    //TODO sprawdzić tu z dyrektywą @key
     //? future purposes 2 parameters in value ex. "key": "address.streetName @data:name"
     // if (value.includes(' ')) {
     //     console.log(value.split(/\s/g));
