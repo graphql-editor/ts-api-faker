@@ -60,7 +60,7 @@ const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise
 
     const gzipResponse = header(req.headers, 'accept-encoding').find((v) => v === 'gzip');
     const data = await getBody(req);
-    let body: string = createResponse(JSON.stringify(data));
+    const body: string = createResponse(JSON.stringify(data));
 
     res.setHeader('content-type', 'application/json');
     if (gzipResponse) {
