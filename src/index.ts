@@ -1,15 +1,14 @@
 import 'module-alias/register';
 
-import FakerController from '@app/controller/FakerController';
-import { createResponse } from "@app/newFaker";
+import { createResponse } from "@app/services/apiFaker";
 
 import { buffer, createError } from 'micro';
 import { ServerResponse, IncomingMessage } from 'http';
 import { gunzip } from 'zlib';
-import { RValueOrArrayValue, iterateAllValuesFaker } from './fake';
 import { gzip, header } from './util';
 
-async function getBody(req: IncomingMessage): Promise<RValueOrArrayValue> {
+
+async function getBody(req: IncomingMessage): Promise<unknown> {
 
     let data: string = '';
     const body = await buffer(req, { limit: '10mb' });
@@ -39,8 +38,6 @@ async function getBody(req: IncomingMessage): Promise<RValueOrArrayValue> {
 
 const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise<unknown> => {
 
-    // const faker = new FakerController();
-
     if (req.method.toUpperCase() === 'OPTIONS') {
         res.setHeader('Access-Control-Max-Age', `${3600 * 24}`);
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -62,21 +59,13 @@ const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise
     }
 
     const gzipResponse = header(req.headers, 'accept-encoding').find((v) => v === 'gzip');
-    // const body = JSON.stringify(iterateAllValuesFaker(await getBody(req)));
-
-    // **********************************-NEW FAKER-*************************************
-
     const data = await getBody(req);
-    // class
-    // const newBody: string = faker.createResponse(JSON.stringify(data));
-    // function
-    const newBody: string = createResponse(JSON.stringify(data));
+    let body: string = createResponse(JSON.stringify(data));
 
-    // ***********************************************************************
     res.setHeader('content-type', 'application/json');
     if (gzipResponse) {
         res.setHeader('content-encoding', 'gzip');
     }
-    return gzipResponse ? gzip(newBody) : newBody;
+    return gzipResponse ? gzip(body) : body;
 };
 export default serveFakeData;

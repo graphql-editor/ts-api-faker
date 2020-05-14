@@ -33,7 +33,7 @@
   "scripts": {
     "build": "tsc",
     "start": "micro",
-    "dev": "node --harmony | tsc -w | micro-dev",
+    "dev": "tsc -w | micro-dev",
     "test": "jest",
     "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\""
   },
