@@ -13,9 +13,9 @@ const lru = new LRU({
 });
 
 export const compare = (entry: string, all: keyMapObject[]): string => {
-    // if (lru.has(entry)) {
-    //     return lru.get(entry);
-    // }
+    if (lru.has(entry)) {
+        return lru.get(entry);
+    }
 
     let minDistance = Infinity;
     let bestMatch = entry;
