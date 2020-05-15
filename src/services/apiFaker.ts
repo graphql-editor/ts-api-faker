@@ -16,15 +16,17 @@ export function createResponse(parsedReq: string): string {
     let preparedData: object = JSON.parse(parsedReq);
     preparedData = passDecode(preparedData, fakeValue, 'static');
     preparedData = passRepeat(preparedData);
-
+    preparedData = passKeyDirective({'0':preparedData}, '0');
     if (!Array.isArray(preparedData)) {
-        preparedData = passSettingsAndKeyDirective(preparedData);
-        if (typeof preparedData['@settings']['root'] !== 'undefined'
-        && preparedData['@settings']['root']
-        && typeof preparedData[Object.keys(preparedData)[1]] === 'object') {
-            preparedData = preparedData[Object.keys(preparedData)[1]];
+        preparedData = passSettings(preparedData);
+        if (typeof preparedData['@settings'] !== 'undefined') {
+            if (typeof preparedData['@settings']['root'] !== 'undefined'
+            && preparedData['@settings']['root']
+            && typeof preparedData[Object.keys(preparedData)[1]] === 'object') {
+                preparedData = preparedData[Object.keys(preparedData)[1]];
+            }
+            delete preparedData['@settings'];
         }
-        delete preparedData['@settings'];
     }
 
     preparedData = passDecode(JSON.parse(JSON.stringify(preparedData)), fakeValue);
@@ -104,9 +106,6 @@ function passRepeat <T> (obj: object | Array<T>): object {
             data[key] = data[key].replace(/@(repeat:?)/g, '');
             let rep: string = data[key];
             if (data[key].includes(',')) {
-                //? 2nd
-                // rep = rep.split(',').find(el => isNumber(el));
-                // data[key] = data[key].replace(rep, '').replace(/\,/g, '');
                 rep = rep.match(/\w+/g).find(el => isNumber(el));
                 data[key] = data[key].replace(/\d,?/g, '');
                 for (let i = 0; i < parseInt(rep); i++) {
@@ -124,26 +123,30 @@ function passRepeat <T> (obj: object | Array<T>): object {
     return data;
 };
 
-function passSettingsAndKeyDirective(obj: object, parent?: object): object {
+function passKeyDirective (obj: object, entry: string): object {
+    let data = obj;
+    for (const key in data) {
+        if (isObject(data[key])) {
+            data[key] = objectFromEntries(Object.entries<string>(data[key]).map(([keys, val]) => {
+                typeof val === 'string' && val.trim() === '@key' && typeof faker[keys] !== 'undefined' ?
+                val = faker[keys][randomElementFromArray(Object.keys(faker[keys]))](): null;
+                return [keys, val];
+            }));
+        }
+        Array.isArray(data[key]) || isObject(data[key]) ? passKeyDirective(data[key], entry) : null;
+    }
+    return data[entry];
+};
+
+function passSettings(obj: object, parent?: object): object {
     let data = obj;
     const parentData = parent || obj;
     if (typeof parentData['data'] || parentData['definitions'] !== 'undefined') {
        for (const key in data) {
-
-            //? @key directive
-            if (isObject(data[key])) {
-                data[key] = objectFromEntries(Object.entries<string>(data[key]).map(([keys, val]) => {
-                    typeof val === 'string' && val.trim() === '@key' ?
-                    val = faker[keys][randomElementFromArray(Object.keys(faker[keys]))](): null;
-                    return [keys, val];
-                }));
-            }
-
             if(typeof data[key] === 'string' && (/@(use|data):?/g).test(data[key])) {
                 let entries: Array<string> = data[key].match(/\w+/g);
                 let entry: string = '';
 
-                //? @data directive
                 if ((/@(data):?/g).test(data[key])) {
                     entry = entries.find(el => (/^data/).test(el));
                     entries.splice(entries.indexOf(entry), 1);
@@ -161,14 +164,13 @@ function passSettingsAndKeyDirective(obj: object, parent?: object): object {
                     data[key] = result;
                 }
 
-                //? @use directive | entry = for future purposes
                 if ((/@(use):?/g).test(data[key])) {
                     entry = entries.find(el => (/^use/).test(el));
                     entries.splice(entries.indexOf(entry), 1);
                     data[key] = parentData['@settings']['definitions'][entries.map(el => el)];
                 }
             }
-            Array.isArray(data[key]) || isObject(data[key]) ? passSettingsAndKeyDirective(data[key], parentData) : null;
+            Array.isArray(data[key]) || isObject(data[key]) ? passSettings(data[key], parentData) : null;
         }
     }
     return data;
