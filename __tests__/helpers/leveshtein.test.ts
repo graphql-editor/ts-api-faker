@@ -1,4 +1,4 @@
-import { compare } from '../src/levenshtein';
+import { compare } from '../../src/helpers/levenshtein';
 
 describe('levenshtein tests', () => {
   it('results are stable', () => {

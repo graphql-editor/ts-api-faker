@@ -18,44 +18,14 @@ After making post request with json argument
 
 ```json
 [
-  {
-    "fields": {
-      "name": {
-        "fake": "name.firstName"
-      },
-      "surname": {
-        "fake": "name.lastName"
-      },
-      "mail": {
-        "fake": "internet.email"
-      },
-      "profilePhoto": {
-        "fake": "internet.avatar"
-      },
-      "animalPhoto": {
-        "fake": "image.cat"
-      }
-    }
-  },
-  {
-    "fields": {
-      "name": {
-        "fake": "name.firstName"
-      },
-      "surname": {
-        "fake": "name.lastName"
-      },
-      "mail": {
-        "fake": "internet.email"
-      },
-      "profilePhoto": {
-        "fake": "internet.avatar"
-      },
-      "animalPhoto": {
-        "fake": "image.dog"
-      }
-    }
-  }
+    {
+      "name": "name.firstName",
+      "surname": "name.lastName",
+      "mail": "internet.email",
+      "profilePhoto": "internet.avatar",
+      "animalPhoto": "image.dog"
+    },
+    "@repeat:1"
 ]
 ```
 
@@ -63,20 +33,20 @@ it returns
 
 ```json
 [
-  {
-    "animalPhoto": "https://source.unsplash.com/200x200/?cat",
-    "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/gu5taf/128.jpg",
-    "mail": "Bernhard_Bradtke@hotmail.com",
-    "surname": "Schaefer",
-    "name": "Madelynn"
-  },
-  {
-    "animalPhoto": "https://source.unsplash.com/200x200/?dog",
-    "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/Elt_n/128.jpg",
-    "mail": "Eula_Spencer24@gmail.com",
-    "surname": "Herzog",
-    "name": "Lempi"
-  }
+    {
+        "animalPhoto": "https://source.unsplash.com/200x200/?cat",
+        "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/gu5taf/128.jpg",
+        "mail": "Bernhard_Bradtke@hotmail.com",
+        "surname": "Schaefer",
+        "name": "Madelynn"
+    },
+    {
+        "animalPhoto": "https://source.unsplash.com/200x200/?dog",
+        "profilePhoto": "https://s3.amazonaws.com/uifaces/faces/twitter/Elt_n/128.jpg",
+        "mail": "Eula_Spencer24@gmail.com",
+        "surname": "Herzog",
+        "name": "Lempi"
+    }
 ]
 ```
 

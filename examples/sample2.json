@@ -1,0 +1,10 @@
+[
+    {
+        "name": "name.firstname",
+        "surname": "name.lastname",
+        "age": "random.number",
+        "company": "company.companyName@static",
+        "random": "@key"
+    },
+    "@repeat:100"
+]

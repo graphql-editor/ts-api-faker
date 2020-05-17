@@ -1,19 +1,18 @@
 module.exports = {
-	roots: ["<rootDir>/src", "<rootDir>/tests"],
-	collectCoverageFrom: ["**/src/**/*.ts"],
-	collectCoverage: true,
-	transform: {'^.+\\.ts?$': 'ts-jest'},
-	testEnvironment: 'node',
-	testMatch: ['**/tests/**/*.test.ts'],
-    moduleFileExtensions: ['ts', 'js'],
-    moduleNameMapper: {
-        "@app(.*)$": "<rootDir>/src/$1",
+  roots: ['<rootDir>/src', '<rootDir>/__tests__'],
+  collectCoverageFrom: ['**/src/**/*.ts', '!**/node_modules/**', '!**/lib/**'],
+  collectCoverage: true,
+  transform: { '^.+\\.ts?$': 'ts-jest' },
+  testEnvironment: 'node',
+  testMatch: ['**/__tests__/**/*.test.ts'],
+  moduleFileExtensions: ['ts', 'js'],
+  moduleNameMapper: {
+    '@app(.*)$': '<rootDir>/src/$1',
+  },
+  globals: {
+    'ts-jest': {
+      tsConfig: 'tsconfig.json',
     },
-	globals: {
-		"ts-jest": {
-			tsConfig: "tsconfig.json"
-		}
-	},
-	testEnvironment: 'node',
-	testRunner: "jest-circus/runner"
+  },
+  testRunner: 'jest-circus/runner',
 };

@@ -67,7 +67,7 @@ describe('test micro integration', () => {
     const resp = await makeRequest({
       body: JSON.stringify({ raw: 'mockdata' }),
     });
-    expect(resp.data.toString()).toEqual('"mockdata"');
+    expect(resp.data.toString()).toEqual('{"raw":"mockdata"}');
     expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.statusCode).toEqual(200);
   });
@@ -89,7 +89,7 @@ describe('test micro integration', () => {
       }),
     );
     const resp = await makeRequest({ body, encoding: 'gzip' });
-    expect(resp.data.toString()).toEqual('"mockdata"');
+    expect(resp.data.toString()).toEqual('{"raw":"mockdata"}');
     expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.statusCode).toEqual(200);
   });
@@ -105,7 +105,7 @@ describe('test micro integration', () => {
     const data = await new Promise((resolve, reject) =>
       gunzip(resp.data, (err, body) => (err ? reject(err) : resolve(body))),
     );
-    expect(data.toString()).toEqual('"mockdata"');
+    expect(data.toString()).toEqual('{"raw":"mockdata"}');
     expect(resp.statusCode).toEqual(200);
   });
   it('accepts preflight', async () => {
