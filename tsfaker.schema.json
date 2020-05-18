@@ -2,58 +2,81 @@
 	"$schema": "http://json-schema.org/draft-07/schema",
 	"$id": "http://tsfaker.graphqleditor.com",
 	"description": "describes accepted input values by ts faker service",
-	"allOf": [
-		{"$ref":"#/definitions/valueOrArrayValue"}
-	],
-	"definitions": {
-		"rawValue": {
-			"type": "object",
-			"description": "value is to be left as is without faking",
-			"additionalProperties": false,
+	"oneOf": [
+		{
+			"type":"object",
 			"properties": {
-				"raw": {
-					"anyOf": [
-						{"type":"null"},
-						{"type":"object"},
-						{"type":"array"},
-						{"type":"number"},
-						{"type":"boolean"},
-						{"type":"string"},
-						{"type":"integer"}
-					]
+				"@settings": {
+					"type": "object",
+					"description": "Generation settings",
+					"additionalProperties": false,
+					"properties": {
+						"data": {
+							"type": "object",
+							"description": "source of static data for @data directive",
+							"additionalProperties": false,
+							"patternProperties": { ".*": {"$ref":"#/definitions/any"} }
+						},
+						"definitions": {
+							"type": "object",
+							"description": "reusable fake definitions for @use direective",
+							"additionalProperties": false,
+							"patternProperties": { ".*": {"$ref":"#/definitions/valueOrArrayValue"} }
+						},
+						"rootValue": {
+							"type": "string",
+							"description": "if set, value under rootValue is treated as output root"
+						}
+					}
 				}
 			},
-			"required": ["raw"]
-		},
-		"fakeValue": {
-			"type": "object",
-			"description": "value is to be faked",
-			"additionalProperties": false,
-			"properties": {
-				"fake": {"type":"string"}
+			"patternProperties": {
+				"^(?!@settings)": {"$ref":"#/definitions/valueOrArrayValue"}
 			},
-			"required": ["fake"]
+			"additionalProperties": false
 		},
-		"objectValue": {
-			"type": "object",
-			"description": "description of an object to be faked",
-			"additionalProperties": false,
-			"properties": {
-				"fields": {
-					"type":"object",
+		{
+			"type": "array",
+			"items": {"$ref":"#/definitions/valueOrArrayValue"}
+		},
+		{ "$ref": "#/definitions/fakeString" }
+	],
+	"definitions": {
+		"any": {
+			"anyOf": [
+				{"type":"null"},
+				{"type":"object"},
+				{"type":"array"},
+				{"type":"number"},
+				{"type":"boolean"},
+				{"type":"string"},
+				{"type":"integer"}
+			]
+		},
+		"fakeString": {
+			"oneOf": [
+				{
+					"type": "string",
+					"pattern": "^@[a-z]{1,}(:[^,]{1,}(,[^,]{1,})*)*$",
+					"description": "faker directive string in a form of @directive[:opt[,opts...]]"
+				},
+				{
+					"type": "string",
+					"pattern": "^[a-zA-Z-9_-]{1,}([.][a-zA-Z-9_-]*)*(@[a-z]{1,}(:[^,]{1,}(,[^,]{1,})*)*)*$",
+					"description": "faker value string in a form of key[.subkeys...][@directive[:opt[,opts...]]]"
+				}
+			]
+		},
+		"value": {
+			"oneOf": [
+				{ "$ref": "#/definitions/fakeString" },
+				{
+					"type": "object",
 					"additionalProperties": false,
 					"patternProperties": {
 						".*": {"$ref":"#/definitions/valueOrArrayValue"}
 					}
 				}
-			},
-			"required": ["fields"]
-		},
-		"value": {
-			"oneOf": [
-				{"$ref":"#/definitions/rawValue"},
-				{"$ref":"#/definitions/fakeValue"},
-				{"$ref":"#/definitions/objectValue"}
 			]
 		},
 		"valueOrArrayValue": {

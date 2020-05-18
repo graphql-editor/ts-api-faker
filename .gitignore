@@ -5,3 +5,4 @@ lib
 *.tmp.txt
 *.map
 coverage
+dev

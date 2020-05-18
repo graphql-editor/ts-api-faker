@@ -1,0 +1,39 @@
+{
+	"@settings": {
+		"data": {
+			"zero": {"one": {
+					"two": {
+						"three": "numbers"
+					}
+				}
+			}
+		},
+		"definitions": {
+            "photo": {
+				"dateTaken": "@static:date.pas",
+				"url": "image.girl.640.480",
+				"placeLat": "addrss.latitu",
+				"placeLong": "address.longitude"
+			}
+        },
+        "root": true
+	},
+	"out": [
+		{
+            "commerce": "@key",
+            "name": "@key",
+            "always": "finance.accountName@static",
+			"things": ["name.findName", "address.secondaryAddress", "@data:zero.one.two.three", "zero@data"],
+			"address": {
+				"street": "address.streetName",
+				"city": "adess.secondyAddss"
+            },
+            "date": "date.past",
+			"avatar": "shpe.circ",
+			"photos": [
+				"3@repeat,@use:photo"
+            ]
+		},
+		"@repeat:10"
+    ]
+}

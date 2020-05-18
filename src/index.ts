@@ -1,12 +1,16 @@
+import 'module-alias/register';
+
+import { createResponse } from '@app/services/apiFaker';
+
 import { buffer, createError } from 'micro';
 import { ServerResponse, IncomingMessage } from 'http';
 import { gunzip } from 'zlib';
-import { RValueOrArrayValue, iterateAllValuesFaker } from './fake';
 import { gzip, header } from './util';
 
-async function getBody(req: IncomingMessage): Promise<RValueOrArrayValue> {
+async function getBody(req: IncomingMessage): Promise<unknown> {
+  let data = '';
   const body = await buffer(req, { limit: '10mb' });
-  let data: string;
+
   switch (req.headers['content-encoding']) {
     case 'gzip':
       data = await new Promise<string>((resolve, reject) => {
@@ -22,6 +26,7 @@ async function getBody(req: IncomingMessage): Promise<RValueOrArrayValue> {
     default:
       data = body.toString();
   }
+
   try {
     return JSON.parse(data);
   } catch (err) {
@@ -49,13 +54,15 @@ const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     return '';
   }
+
   const gzipResponse = header(req.headers, 'accept-encoding').find((v) => v === 'gzip');
-  const body = JSON.stringify(iterateAllValuesFaker(await getBody(req)));
+  const data = await getBody(req);
+  const body: string = createResponse(JSON.stringify(data));
+
   res.setHeader('content-type', 'application/json');
   if (gzipResponse) {
     res.setHeader('content-encoding', 'gzip');
   }
   return gzipResponse ? gzip(body) : body;
 };
-
 export default serveFakeData;

@@ -12,7 +12,7 @@ module.exports = {
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['prettier', '@typescript-eslint'],
   overrides: [
     {
       files: ["**/*.ts"],
@@ -22,6 +22,13 @@ module.exports = {
         'prettier/@typescript-eslint', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
       ]
     }
-  ]
+  ],
+  rules: {
+    'prettier/prettier': 'warn',
+    'prefer-const': ['warn', {
+        'destructuring': 'all',
+        'ignoreReadBeforeAssign': false
+    }]
+  }
 };
 

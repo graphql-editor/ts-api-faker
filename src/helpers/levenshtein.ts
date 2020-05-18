@@ -1,11 +1,7 @@
 import * as levenshtein from 'fast-levenshtein';
 import LRU from 'lru-cache';
 
-export type keyMapObject = {
-  name: string;
-  key: string;
-  value: string;
-};
+import { keyMapObject } from '@app/helpers/assets';
 
 // 5MB Cache
 const lru = new LRU({
@@ -16,20 +12,21 @@ const lru = new LRU({
   },
 });
 
-export const compare = (s: string, all: keyMapObject[]): string => {
-  if (lru.has(s)) {
-    return lru.get(s);
+export const compare = (entry: string, all: keyMapObject[]): string => {
+  if (lru.has(entry)) {
+    return lru.get(entry);
   }
+
   let minDistance = Infinity;
-  let bestMatch = s;
+  let bestMatch = entry;
   for (const st of all) {
-    [st.name, st.value, st.key].forEach((v) => {
+    [st.name, st.value, st.key].forEach((value) => {
       // short path, minDistance is alread at zero
       // no need for further checks
       if (!minDistance) {
         return;
       }
-      const distance = levenshtein.get(s, v);
+      const distance = levenshtein.get(entry, value);
       if (distance < minDistance) {
         bestMatch = st.name;
         minDistance = distance;
@@ -39,6 +36,7 @@ export const compare = (s: string, all: keyMapObject[]): string => {
       break;
     }
   }
-  lru.set(s, bestMatch);
+
+  lru.set(entry, bestMatch);
   return bestMatch;
 };
