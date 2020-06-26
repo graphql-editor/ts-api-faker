@@ -1,7 +1,7 @@
 # Build stage image
 # Pulls all dependencies including dev and builds
 # server runtime
-FROM node:carbon as build
+FROM node:12 as build
 
 RUN mkdir /app
 WORKDIR /app
