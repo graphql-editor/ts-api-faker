@@ -6,7 +6,6 @@ import { keyMapObject, permittedFakerMethods, fakerExtension } from '@app/helper
 import {
   isObject,
   isNumber,
-  objectFromEntries,
   randomElementFromArray,
   resolveImages,
   randomDate,
@@ -64,14 +63,7 @@ export const fakeValue = (word: string): string => {
     return output;
   }
 
-  if (
-    !(typeof faker[key] !== 'undefined' && typeof faker[key][value] !== 'undefined') &&
-    /^\w+\D(\.)\w+\D$/.test(data)
-  ) {
-    return fakeValue(compare(`${key}.${value}`, allKeys));
-  }
-
-  return data;
+  return fakeValue(compare(data, allKeys));
 };
 
 const passDecode = (obj: object, fakerFunc: CallableFunction, directive?: string): object => {
@@ -114,22 +106,18 @@ const passRepeat = <T>(obj: object | Array<T>): object => {
   return data;
 };
 
-const passKeyDirective = (obj: object, entry: string): object => {
+const passKeyDirective = (obj: object): object => {
   const data = obj;
-  for (const key in data) {
-    if (isObject(data[key])) {
-      data[key] = objectFromEntries(
-        Object.entries<string>(data[key]).map(([keys, val]) => {
-          typeof val === 'string' && val.trim() === '@key' && typeof faker[keys] !== 'undefined'
-            ? (val = faker[keys][randomElementFromArray(Object.keys(faker[keys]))]())
-            : null;
-          return [keys, val];
-        }),
-      );
-    }
-    Array.isArray(data[key]) || isObject(data[key]) ? passKeyDirective(data[key], entry) : null;
+  if (Array.isArray(data)) {
+    return data.map((v) => passKeyDirective(v));
   }
-  return data[entry];
+  if (!data || typeof data !== 'object') {
+    return data;
+  }
+  for (const key in data) {
+    data[key] = typeof data[key] == 'string' && data[key].trim() === '@key' ? key : passKeyDirective(data[key]);
+  }
+  return data;
 };
 
 const passSettings = (obj: object, parent?: object): object => {
@@ -174,7 +162,7 @@ export const createResponse = (parsedReq: string): string => {
   let preparedData: object = JSON.parse(parsedReq);
   preparedData = passDecode(preparedData, fakeValue, 'static');
   preparedData = passRepeat(preparedData);
-  preparedData = passKeyDirective({ '0': preparedData }, '0');
+  preparedData = passKeyDirective(preparedData);
   if (!Array.isArray(preparedData)) {
     preparedData = passSettings(preparedData);
     if (typeof preparedData['@settings'] !== 'undefined') {
