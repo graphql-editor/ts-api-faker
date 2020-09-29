@@ -50,7 +50,7 @@ describe('test micro integration', () => {
           resp.on('error', (e) => reject(e));
           resp.on('end', () =>
             resolve({
-              statusCode: resp.statusCode,
+              statusCode: resp.statusCode || 0,
               headers: resp.headers,
               data,
             }),
@@ -65,9 +65,17 @@ describe('test micro integration', () => {
     });
   it('handles raw json', async () => {
     const resp = await makeRequest({
-      body: JSON.stringify({ raw: 'mockdata' }),
+      body: JSON.stringify({
+        '@settings': {
+          data: {
+            mock: 'mockdata',
+          },
+          root: true,
+        },
+        out: '@data:mock',
+      }),
     });
-    expect(resp.data.toString()).toEqual('{"raw":"mockdata"}');
+    expect(resp.data.toString()).toEqual('"mockdata"');
     expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.statusCode).toEqual(200);
   });
@@ -80,16 +88,27 @@ describe('test micro integration', () => {
   });
   it('handles gzipped json', async () => {
     const body = await new Promise<Buffer>((resolve, reject) =>
-      gzip(JSON.stringify({ raw: 'mockdata' }), (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      }),
+      gzip(
+        JSON.stringify({
+          '@settings': {
+            data: {
+              mock: 'mockdata',
+            },
+            root: true,
+          },
+          out: '@data:mock',
+        }),
+        (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        },
+      ),
     );
     const resp = await makeRequest({ body, encoding: 'gzip' });
-    expect(resp.data.toString()).toEqual('{"raw":"mockdata"}');
+    expect(resp.data.toString()).toEqual('"mockdata"');
     expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.statusCode).toEqual(200);
   });
@@ -99,13 +118,24 @@ describe('test micro integration', () => {
     expect(resp.statusCode).toEqual(400);
   });
   it('responds with gzip', async () => {
-    const resp = await makeRequest({ body: JSON.stringify({ raw: 'mockdata' }), acceptEncoding: 'gzip,deflate' });
+    const resp = await makeRequest({
+      body: JSON.stringify({
+        '@settings': {
+          data: {
+            mock: 'mockdata',
+          },
+          root: true,
+        },
+        out: '@data:mock',
+      }),
+      acceptEncoding: 'gzip,deflate',
+    });
     expect(resp.headers['content-type']).toEqual('application/json');
     expect(resp.headers['content-encoding']).toEqual('gzip');
-    const data = await new Promise((resolve, reject) =>
+    const data: object = await new Promise((resolve, reject) =>
       gunzip(resp.data, (err, body) => (err ? reject(err) : resolve(body))),
     );
-    expect(data.toString()).toEqual('{"raw":"mockdata"}');
+    expect(data.toString()).toEqual('"mockdata"');
     expect(resp.statusCode).toEqual(200);
   });
   it('accepts preflight', async () => {

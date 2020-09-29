@@ -35,7 +35,7 @@ async function getBody(req: IncomingMessage): Promise<unknown> {
 }
 
 const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise<unknown> => {
-  if (req.method.toUpperCase() === 'OPTIONS') {
+  if (((req || {}).method || '').toUpperCase() === 'OPTIONS') {
     res.setHeader('Access-Control-Max-Age', `${3600 * 24}`);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', ['POST', 'OPTIONS'].join(','));

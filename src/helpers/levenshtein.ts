@@ -1,7 +1,7 @@
 import * as levenshtein from 'fast-levenshtein';
 import LRU from 'lru-cache';
 
-import { keyMapObject } from '@app/helpers/assets';
+import { isFakerMapping, keyMapObject } from '@app/helpers/assets';
 
 // 5MB Cache
 const lru = new LRU({
@@ -14,13 +14,19 @@ const lru = new LRU({
 
 export const compare = (entry: string, all: keyMapObject[]): string => {
   if (lru.has(entry)) {
-    return lru.get(entry);
+    return lru.get(entry) || '';
   }
 
   let minDistance = Infinity;
   let bestMatch = entry;
   for (const st of all) {
-    [st.name, st.value, st.key].forEach((value) => {
+    const { name, mapping } = st;
+    const check = [name];
+    if (isFakerMapping(mapping)) {
+      const { key, value } = mapping;
+      check.push(...[key, value]);
+    }
+    check.forEach((value) => {
       // short path, minDistance is alread at zero
       // no need for further checks
       if (!minDistance) {

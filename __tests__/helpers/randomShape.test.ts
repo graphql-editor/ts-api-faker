@@ -1,4 +1,4 @@
-import { randomShape } from '../../src/services/randomShape';
+import { randomShape } from '../../src/helpers/randomShape';
 
 describe('randomShape tests', () => {
   it('returns random shape', () => {

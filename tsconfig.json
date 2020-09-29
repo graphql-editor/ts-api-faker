@@ -15,6 +15,7 @@
     "rootDir": "src",
 	"types": ["node", "jest"],
     "esModuleInterop": true,
+	"strictNullChecks": true,
     "paths": {
         "@app/*": ["./*"]
     }

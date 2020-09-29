@@ -11,7 +11,7 @@ describe('levenshtein tests', () => {
     const keys = new Array(40).fill('').map(() => {
       const key = randomString(6);
       const value = randomString(6);
-      return { name: `${key}.${value}`, key, value };
+      return { name: `${key}.${value}`, mapping: { key, value } };
     });
     const first = compare('mockkey.withval', keys);
     new Array(10).fill('').forEach(() => {
@@ -23,13 +23,17 @@ describe('levenshtein tests', () => {
       compare('close.value', [
         {
           name: 'far.value',
-          key: 'far',
-          value: 'value',
+          mapping: {
+            key: 'far',
+            value: 'value',
+          },
         },
         {
           name: 'close.value',
-          key: 'close',
-          value: 'value',
+          mapping: {
+            key: 'close',
+            value: 'value',
+          },
         },
       ]),
     ).toEqual('close.value'); // 0 distance on name
@@ -37,13 +41,17 @@ describe('levenshtein tests', () => {
       compare('close', [
         {
           name: 'far.value',
-          key: 'far',
-          value: 'value',
+          mapping: {
+            key: 'far',
+            value: 'value',
+          },
         },
         {
           name: 'close.value',
-          key: 'close',
-          value: 'value',
+          mapping: {
+            key: 'close',
+            value: 'value',
+          },
         },
       ]),
     ).toEqual('close.value'); // 0 distance on key
@@ -51,13 +59,17 @@ describe('levenshtein tests', () => {
       compare('value', [
         {
           name: 'far.value',
-          key: 'far',
-          value: 'value',
+          mapping: {
+            key: 'far',
+            value: 'value',
+          },
         },
         {
           name: 'close.value',
-          key: 'close',
-          value: 'value',
+          mapping: {
+            key: 'close',
+            value: 'value',
+          },
         },
       ]),
     ).toEqual('far.value'); // 0 distance on value for both, return first matching

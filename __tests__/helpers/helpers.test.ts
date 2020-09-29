@@ -29,19 +29,6 @@ describe('helpers tests', () => {
     expect(helpers.isNumber('abc')).toBeFalsy();
   });
 
-  it('returns an object from the array', () => {
-    const obj = { key1: 'val1', key2: 'val2' };
-    const parsed = helpers.objectFromEntries(Object.entries(obj));
-    expect(obj).toBeDefined();
-    expect(obj).toStrictEqual(parsed);
-    expect(() => {
-      // for test purposes only
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      //@ts-ignore
-      helpers.objectFromEntries(['1']);
-    }).toThrowError(TypeError('iterable for fromEntries should yield objects'));
-  });
-
   it('returns random date', () => {
     const randomDate = helpers.randomDate();
     expect(randomDate).toBeDefined();

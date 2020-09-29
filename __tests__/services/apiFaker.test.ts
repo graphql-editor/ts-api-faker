@@ -1,4 +1,23 @@
-import { createResponse, fakeValue } from '../../src/services/apiFaker';
+import { createResponse } from '../../src/services/apiFaker';
+import { fakeValue } from '../../src/services/render';
+
+declare global {
+  /* eslint-disable no-redeclare, @typescript-eslint/no-namespace */
+  namespace jest {
+    /* eslint-enable no-redeclare, @typescript-eslint/no-namespace */
+    interface Expect {
+      toBeNumber: () => CustomMatcherResult;
+    }
+  }
+}
+expect.extend({
+  toBeNumber(received) {
+    return {
+      message: (): string => `expected ${received} of type ${typeof received} is not a number`,
+      pass: typeof received === 'number',
+    };
+  },
+});
 
 describe('apiFaker tests', () => {
   it('generates fake data', () => {
@@ -9,9 +28,8 @@ describe('apiFaker tests', () => {
         date: '@key',
         num: 'random.number',
       },
-      '@repeat:1',
+      '@repeat:2',
     ];
-    type output2 = [{ name: string; date: string; num: number }, { name: string; date: string; num: number }];
     const sample3 = {
       '@settings': {
         data: {
@@ -50,7 +68,7 @@ describe('apiFaker tests', () => {
           nameFromData: '@data:name',
           valueFromNested: 'nested.one.two.three@data',
           nullProperty: null,
-          customers: ['@use:customer,@repeat:1'],
+          customers: ['@use:customer,@repeat:2'],
         },
       ],
     };
@@ -91,12 +109,24 @@ describe('apiFaker tests', () => {
         ],
       },
     ];
+    const desiredOutputSample2 = [
+      {
+        name: expect.stringMatching(/^((?!@key).)*$/),
+        date: expect.stringMatching(/^((?!@key).)*$/),
+        num: expect.toBeNumber(),
+      },
+      {
+        name: expect.stringMatching(/^((?!@key).)*$/),
+        date: expect.stringMatching(/^((?!@key).)*$/),
+        num: expect.toBeNumber(),
+      },
+    ];
 
     const faked1 = JSON.parse(createResponse(JSON.stringify(sample1)));
     const faked2 = JSON.parse(createResponse(JSON.stringify(sample2)));
     const faked3 = JSON.parse(createResponse(JSON.stringify(sample3)));
     expect(faked1.name).toMatch(/^((?!@key).)*$/s);
-    expect(faked2).toMatchObject<output2>(faked2);
+    expect(faked2).toMatchObject(desiredOutputSample2);
     expect(faked3).toMatchObject(desiredOutputSample3);
   });
 
@@ -112,7 +142,6 @@ describe('apiFaker tests', () => {
     expect(fakeValue('@data:name')).toStrictEqual('@data:name');
     expect(fakeValue('@use:photo')).toStrictEqual('@use:photo');
     expect(fakeValue('@key')).toStrictEqual('@key');
-    expect(fakeValue('<svg></svg>')).toStrictEqual('<svg></svg>');
     expect(fakeValue('image.girl.640.480')).toStrictEqual(exImage);
     expect(fakeValue('photo.girl.640.480')).toStrictEqual(exImage);
     expect(fakeValue('picture.girl.640.480')).toStrictEqual(exImage);

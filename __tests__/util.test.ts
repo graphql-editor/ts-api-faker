@@ -14,7 +14,7 @@ describe('util tests', () => {
       gzip('data', { gzip: (_: InputType, cb: CompressCallback) => cb(null, Buffer.from('data')) }),
     ).resolves.toEqual(Buffer.from('data'));
     await expect(
-      gzip('data', { gzip: (_: InputType, cb: CompressCallback) => cb(new Error('error'), null) }),
+      gzip('data', { gzip: (_: InputType, cb: CompressCallback) => cb(new Error('error'), Buffer.from('')) }),
     ).rejects.toEqual(new Error('error'));
   });
 });
