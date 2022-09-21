@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { isObject, traverseData } from '@app/helpers/helpers';
 import { compare } from '@app/helpers/levenshtein';

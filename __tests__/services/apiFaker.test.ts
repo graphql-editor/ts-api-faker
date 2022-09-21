@@ -10,11 +10,15 @@ declare global {
     }
   }
 }
+
+
+const isRandomNumber = (v: unknown) => typeof v === 'string' && /^[0-9]$/.test(v);
+
 expect.extend({
   toBeNumber(received) {
     return {
       message: (): string => `expected ${received} of type ${typeof received} is not a number`,
-      pass: typeof received === 'number',
+      pass: isRandomNumber(received),
     };
   },
 });
@@ -136,8 +140,7 @@ describe('apiFaker tests', () => {
     expect(fakeValue('address.country')).toMatch(/^((?!address.country).)*$/s);
     expect(fakeValue('nae.fndam')).toMatch(/^((?!name.findName).)*$/s);
     expect(['male', 'female', 'unset']).toContain(fakeValue('gender'));
-    expect(typeof fakeValue('random.number') === 'number').toBeTruthy();
-    expect(typeof fakeValue('random.boolean') === 'boolean').toBeTruthy();
+    expect(isRandomNumber(fakeValue('random.number'))).toBeTruthy();
     expect(typeof fakeValue('company.suffixes') === 'object').toBeTruthy();
     expect(fakeValue('@data:name')).toStrictEqual('@data:name');
     expect(fakeValue('@use:photo')).toStrictEqual('@use:photo');
@@ -147,7 +150,7 @@ describe('apiFaker tests', () => {
     expect(fakeValue('picture.girl.640.480')).toStrictEqual(exImage);
     expect(fakeValue('image.girl')).toStrictEqual('https://source.unsplash.com/200x200/?girl');
     expect(fakeValue('image')).toStrictEqual('https://source.unsplash.com/200x200/?image');
-    expect(fakeValue('image.imageUrl')).toMatch(/lorempixel/);
+    expect(fakeValue('image.imageUrl')).toMatch(/loremflickr/);
     expect(fakeValue('date.month')).toMatch(/^((?!date.month).)*$/s);
   });
 });

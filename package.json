@@ -5,7 +5,7 @@
   "description": "",
   "main": "lib/index.js",
   "dependencies": {
-    "faker": "^4.1.0",
+    "@faker-js/faker": "^7.5.0",
     "fast-levenshtein": "^2.0.6",
     "lru-cache": "^5.1.1",
     "micro": "^9.3.1",
@@ -31,7 +31,7 @@
     "micro-dev": "^3.0.0",
     "prettier": "^1.19.1",
     "ts-jest": "^25.2.1",
-    "typescript": "^3.7.5"
+    "typescript": "^4.8.0"
   },
   "scripts": {
     "build": "tsc",

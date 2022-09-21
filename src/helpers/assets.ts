@@ -1,6 +1,6 @@
 import { randomShape } from '@app/helpers/randomShape';
 import { randomElementFromArray, resolveImages, randomDate } from '@app/helpers/helpers';
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 interface FakerMapping {
   key: string;

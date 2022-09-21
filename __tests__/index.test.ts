@@ -7,7 +7,7 @@ describe('test micro integration', () => {
   const server = micro(handler);
   beforeAll(
     async (done): Promise<unknown> => {
-      await new Promise((resolve) => {
+      await new Promise<void>((resolve) => {
         server.listen(3000, () => {
           resolve();
         });
