@@ -6,8 +6,9 @@ import { isFakerMapping, keyMapObject } from '@app/helpers/assets';
 // 5MB Cache
 const lru = new LRU({
   max: 5 * 1024 * 1024,
-  maxAge: 1000 * 60 * 60,
-  length: (n: string, key: string): number => {
+  ttl: 1000 * 60 * 60,
+  maxSize: 1024 * 1024 * 10,
+  sizeCalculation: (n: string, key: string): number => {
     return n.length + key.length;
   },
 });

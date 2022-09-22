@@ -1,23 +1,17 @@
-import micro from 'micro';
+import { run } from 'micro';
+import { Server } from 'http';
 import handler from '../src';
 import { request, IncomingHttpHeaders } from 'http';
 import { gzip, gunzip } from 'zlib';
 
 describe('test micro integration', () => {
-  const server = micro(handler);
-  beforeAll(
-    async (done): Promise<unknown> => {
-      await new Promise<void>((resolve) => {
-        server.listen(3000, () => {
-          resolve();
-        });
-      });
-      done();
-      return;
-    },
-  );
-  afterAll(() => {
-    server.close();
+  const server = new Server((req, res) => run(req, res, handler));
+
+  beforeAll((done) => {
+    server.listen(3000, () => done());
+  });
+  afterAll((done) => {
+    server.close(() => done());
   });
   const makeRequest = ({
     body,

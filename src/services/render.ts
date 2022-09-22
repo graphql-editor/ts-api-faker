@@ -26,7 +26,7 @@ const allKeys: keyMapObject[] = permittedFakerMethods
 const callbacks = allKeys.reduce((pv, cv) => {
   if (isFakerMapping(cv.mapping)) {
     const mapping = cv.mapping;
-    pv[cv.name] = (_1, _2, arg1, arg2): unknown => faker[mapping.key][mapping.value](arg1, arg2);
+      pv[cv.name] = (_1, _2, arg1, arg2) => faker[mapping.key][mapping.value](arg1, arg2);
   } else {
     pv[cv.name] = cv.mapping;
   }

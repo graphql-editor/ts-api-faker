@@ -63,9 +63,9 @@ describe('apiFaker tests', () => {
       },
       out: [
         {
-          company: 'company.companyName',
+          company: 'company.name',
           address: {
-            street: 'address.streetName',
+            street: 'address.street',
             zipcode: 'addre.zipCode',
             country: 'adess.country@static',
           },
@@ -79,9 +79,9 @@ describe('apiFaker tests', () => {
 
     const desiredOutputSample3 = [
       {
-        company: expect.stringMatching(/^((?!company.companyName).)*$/s),
+        company: expect.stringMatching(/^((?!company.name).)*$/s),
         address: {
-          street: expect.stringMatching(/^((?!address.streetName).)*$/s),
+          street: expect.stringMatching(/^((?!address.street).)*$/s),
           zipcode: expect.stringMatching(/^((?!addre.zipCode).)*$/s),
           country: expect.stringMatching(/^((?!adess.country@static).)*$/s),
         },
@@ -138,7 +138,7 @@ describe('apiFaker tests', () => {
     const exImage = 'https://source.unsplash.com/640x480/?girl';
     expect(fakeValue('')).toMatch('');
     expect(fakeValue('address.country')).toMatch(/^((?!address.country).)*$/s);
-    expect(fakeValue('nae.fndam')).toMatch(/^((?!name.findName).)*$/s);
+    expect(fakeValue('nae.funlam')).toMatch(/^((?!name.fullName).)*$/s);
     expect(['male', 'female', 'unset']).toContain(fakeValue('gender'));
     expect(isRandomNumber(fakeValue('random.number'))).toBeTruthy();
     expect(typeof fakeValue('company.suffixes') === 'object').toBeTruthy();
