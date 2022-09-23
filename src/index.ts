@@ -3,9 +3,10 @@ import 'module-alias/register';
 import { createResponse } from '@app/services/apiFaker';
 
 import { buffer, createError } from 'micro';
-import { ServerResponse, IncomingMessage } from 'http';
+import { ServerResponse, IncomingMessage, Server } from 'http';
 import { gunzip } from 'zlib';
 import { gzip, header } from './util';
+import { run } from 'micro'
 
 async function getBody(req: IncomingMessage): Promise<unknown> {
   let data = '';
@@ -65,4 +66,17 @@ const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise
   }
   return gzipResponse ? gzip(body) : body;
 };
-export default serveFakeData;
+
+const srv = new Server((req, res) => run(req, res, serveFakeData));
+srv.listen(3000, () => {
+  console.log('Now listenning on port 3000');
+});
+
+const finish = () => {
+  console.log('Gracefully shutting down');
+  srv.close(() => {
+    console.log('Exiting ....');
+  });
+}
+process.on('SIGINT', finish)
+process.on('SIGTERM', finish)

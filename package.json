@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && micro",
+    "start": "npm run build && node ./lib/index.js",
     "test": "jest --config jest.config.cjs",
     "lint": "eslint \"src/**/*.ts\" \"__tests__/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\" \"__tests__/**/*.ts\""
