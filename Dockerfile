@@ -30,4 +30,4 @@ COPY --from=vendor /app /app
 # Copy results of build from build stage
 COPY --from=build /app/lib /app/lib
 EXPOSE 3000
-CMD [ "node", "/app/lib/index.js" ]
+CMD [ "/app/lib/index.js" ]
