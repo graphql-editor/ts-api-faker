@@ -67,12 +67,12 @@ export const serveFakeData = async (req: IncomingMessage, res: ServerResponse): 
   return gzipResponse ? gzip(body) : body;
 };
 
-const srv = new Server((req, res) => run(req, res, serveFakeData));
+export const srv = new Server((req, res) => run(req, res, serveFakeData));
 srv.listen(3000, () => {
   console.log('Now listenning on port 3000');
 });
 
-const finish = () => {
+export const finish = () => {
   console.log('Gracefully shutting down');
   srv.close(() => {
     console.log('Exiting ....');
