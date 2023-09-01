@@ -58,7 +58,6 @@ jobs:
         with:
           images: gqleditor/ts-api-faker
       - name: show dir
-        working-directory: app
         run: |
           ls -la
       - name: Build and push Docker image
