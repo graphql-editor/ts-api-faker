@@ -24,7 +24,6 @@ const allKeys: keyMapObject[] = permittedFakerMethods
   .concat(fakerExtension)
   .sort((a, b) => (a.name < b.name ? -1 : a.name === b.name ? 0 : 1));
 
-console.log(JSON.stringify(allKeys,null,2))
 function conversions(v: unknown) {
   if (v instanceof Date) {
     return v.toUTCString();
