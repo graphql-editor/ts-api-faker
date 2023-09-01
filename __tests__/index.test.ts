@@ -1,11 +1,11 @@
 import { run } from 'micro';
 import { Server } from 'http';
-import handler from '../src';
+import { serveFakeData } from '../src';
 import { request, IncomingHttpHeaders } from 'http';
 import { gzip, gunzip } from 'zlib';
 
 describe('test micro integration', () => {
-  const server = new Server((req, res) => run(req, res, handler));
+  const server = new Server((req, res) => run(req, res, serveFakeData));
 
   beforeAll((done) => {
     server.listen(3000, () => done());

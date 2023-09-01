@@ -6,7 +6,7 @@ import { buffer, createError } from 'micro';
 import { ServerResponse, IncomingMessage, Server } from 'http';
 import { gunzip } from 'zlib';
 import { gzip, header } from './util';
-import { run } from 'micro'
+import { run } from 'micro';
 
 async function getBody(req: IncomingMessage): Promise<unknown> {
   let data = '';
@@ -35,7 +35,7 @@ async function getBody(req: IncomingMessage): Promise<unknown> {
   }
 }
 
-const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise<unknown> => {
+export const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise<unknown> => {
   if (((req || {}).method || '').toUpperCase() === 'OPTIONS') {
     res.setHeader('Access-Control-Max-Age', `${3600 * 24}`);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -77,6 +77,6 @@ const finish = () => {
   srv.close(() => {
     console.log('Exiting ....');
   });
-}
-process.on('SIGINT', finish)
-process.on('SIGTERM', finish)
+};
+process.on('SIGINT', finish);
+process.on('SIGTERM', finish);
