@@ -6,7 +6,7 @@ import { buffer, createError } from 'micro';
 import { ServerResponse, IncomingMessage, Server } from 'http';
 import { gunzip } from 'zlib';
 import { gzip, header } from './util';
-import { run } from 'micro'
+import { run } from 'micro';
 
 async function getBody(req: IncomingMessage): Promise<unknown> {
   let data = '';
@@ -35,7 +35,7 @@ async function getBody(req: IncomingMessage): Promise<unknown> {
   }
 }
 
-const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise<unknown> => {
+export const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise<unknown> => {
   if (((req || {}).method || '').toUpperCase() === 'OPTIONS') {
     res.setHeader('Access-Control-Max-Age', `${3600 * 24}`);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -67,16 +67,16 @@ const serveFakeData = async (req: IncomingMessage, res: ServerResponse): Promise
   return gzipResponse ? gzip(body) : body;
 };
 
-const srv = new Server((req, res) => run(req, res, serveFakeData));
+export const srv = new Server((req, res) => run(req, res, serveFakeData));
 srv.listen(3000, () => {
   console.log('Now listenning on port 3000');
 });
 
-const finish = () => {
+export const finish = () => {
   console.log('Gracefully shutting down');
   srv.close(() => {
     console.log('Exiting ....');
   });
-}
-process.on('SIGINT', finish)
-process.on('SIGTERM', finish)
+};
+process.on('SIGINT', finish);
+process.on('SIGTERM', finish);

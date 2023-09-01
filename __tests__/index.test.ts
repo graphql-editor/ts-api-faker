@@ -1,17 +1,10 @@
-import { run } from 'micro';
-import { Server } from 'http';
-import handler from '../src';
+import { srv } from '../src';
 import { request, IncomingHttpHeaders } from 'http';
 import { gzip, gunzip } from 'zlib';
 
 describe('test micro integration', () => {
-  const server = new Server((req, res) => run(req, res, handler));
-
-  beforeAll((done) => {
-    server.listen(3000, () => done());
-  });
   afterAll((done) => {
-    server.close(() => done());
+    srv.close(() => done());
   });
   const makeRequest = ({
     body,
