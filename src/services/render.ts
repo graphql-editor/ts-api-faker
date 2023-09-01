@@ -20,9 +20,11 @@ const allKeys: keyMapObject[] = permittedFakerMethods
     ),
   )
   .reduce((a, b) => [...a, ...b])
+  .filter( v => 'value' in v.mapping ?v.mapping.value !== 'faker' :true)
   .concat(fakerExtension)
   .sort((a, b) => (a.name < b.name ? -1 : a.name === b.name ? 0 : 1));
 
+console.log(JSON.stringify(allKeys,null,2))
 function conversions(v: unknown) {
   if (v instanceof Date) {
     return v.toUTCString();
@@ -65,14 +67,16 @@ export function fakeValue(data: string): unknown {
   if (data.length <= 0 || data.startsWith(DirectivePrefix)) {
     return data;
   }
+  console.log(data)
   const [key, value, ...rest] = data.match(/\w+/g) || [];
+  console.log(key,value)
   //? pipes ex.date format
-  if (typeof faker[key] !== 'undefined' && typeof faker[key][value] !== 'undefined') {
+  if (key && value && typeof faker[key] !== 'undefined' && typeof faker[key][value] !== 'undefined') {
     const output = conversions(faker[key][value](...rest));
     return output;
   }
   const bestMatch = compare(data, allKeys);
-  const callback = getFakerCallback(bestMatch, key, value);
+  const callback = getFakerCallback(bestMatch, key || '', value);
   return callback(...rest);
 }
 
