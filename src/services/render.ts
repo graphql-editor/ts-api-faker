@@ -66,9 +66,7 @@ export function fakeValue(data: string): unknown {
   if (data.length <= 0 || data.startsWith(DirectivePrefix)) {
     return data;
   }
-  console.log(data)
   const [key, value, ...rest] = data.match(/\w+/g) || [];
-  console.log(key,value)
   //? pipes ex.date format
   if (key && value && typeof faker[key] !== 'undefined' && typeof faker[key][value] !== 'undefined') {
     const output = conversions(faker[key][value](...rest));
