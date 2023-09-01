@@ -44,6 +44,7 @@ jobs:
       - name: build
         run: npm run build
   push_to_registry:
+    if: github.ref == 'refs/heads/master'
     name: login, build and push docker image to docker hub
     runs-on: ubuntu-latest
     steps:
